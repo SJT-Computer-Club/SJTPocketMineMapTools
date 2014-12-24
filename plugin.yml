@@ -4,15 +4,19 @@ version: 0.0.1
 api: 1.0.0
 
 commands:
-    startpermit:
-        description: "Start a new permit region using the player's current location"
-        usage: "/startpermit [player]"
+    startregion:
+        description: "Start a new region using the player's current location"
+        usage: "/startregion [player]"
         permission: myplugin.example
-    endpermit:
-        description: "Finish a new permit region using the player's current location, defining the permit name in the process"
-        usage: "/endpermit <permitname> [player]"
+    endregion:
+        description: "Finish a new region using the player's current location, defining the region name"
+        usage: "/endregion <regionname> [player]"
         permission: myplugin.example
-    teleporttopermit:
-        description: "Teleport player to a named permit region"
-        usage: "/endpermit <permitname> [player]"
+    tptoregion:
+        description: "Teleport player to a named region"
+        usage: "/tptoregion <regionname> [player]"
+        permission: myplugin.example
+    deleteregion:
+        description: "Delete a named region"
+        usage: "/deleteregion <regionname> [player]"
         permission: myplugin.example

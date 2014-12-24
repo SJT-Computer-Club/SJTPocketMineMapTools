@@ -11,8 +11,8 @@ use pocketmine\command\CommandSender;
  */
 class SJTMapTools extends PluginBase {
 
-    
     private $regionManager;
+    private $dataFolder;
     
     /**
      * Called when the plugin is enabled
@@ -20,7 +20,7 @@ class SJTMapTools extends PluginBase {
     public function onEnable() {
         $this->getLogger()->info('Plugin Enabled');
         $this->initDataFolder();
-        $this->regionManager = new RegionManager($this, $dataFolder . 'regions/');
+        $this->regionManager = new RegionManager($this, $this->dataFolder . 'regions/');
     }
 
     /**
@@ -33,10 +33,10 @@ class SJTMapTools extends PluginBase {
 
     /* Data handling */
     private function initDataFolder() {
-        $dataFolder = $this->getDataFolder() . 'data/';
-        if (!is_dir($dataFolder)) {
-            $this->getLogger()->info('Data folder not found, creating at: ' . $dataFolder);
-            mkdir($dataFolder, 0755, true);
+        $this->dataFolder = $this->getDataFolder() . 'data/';
+        if (!is_dir($this->dataFolder)) {
+            $this->getLogger()->info('Data folder not found, creating at: ' . $this->dataFolder);
+            mkdir($this->dataFolder, 0755, true);
         }
     }
     
@@ -45,24 +45,24 @@ class SJTMapTools extends PluginBase {
     /**
      * Handle a command from a player
      * 
-     * @param \Psycle\SJTMapTools\CommandSender $sender The command sender object
-     * @param \Psycle\SJTMapTools\Command $command The command object
-     * @param type $label 
+     * @param CommandSender $sender The command sender object
+     * @param Command $command The command object
+     * @param type $label
      * @param array $args The command arguments
      * @return boolean
      */
     public function onCommand(CommandSender $sender, Command $command, $label, array $args) {
-        if (strtolower($command->getName()) === 'startpermit') {
-            $this->getLogger()->info('Starting a permit region');
-            
-            return true;
-        } elseif (strtolower($command->getName()) === 'endpermit') {
-            $this->getLogger()->info('Ending a permit region');
-            
-            return true;
-        } elseif (strtolower($command->getName()) === 'teleporttopermit') {
-            $this->getLogger()->info('Teleporting to a permit region');
-            
+        if (strtolower($command->getName()) === 'startregion') {
+            $this->getLogger()->info('Starting a region');
+            return $this->startRegion($sender, $args);
+        } elseif (strtolower($command->getName()) === 'endregion') {
+            $this->getLogger()->info('Ending a region');
+            return $this->endRegion($sender, $args);
+        } elseif (strtolower($command->getName()) === 'tptoregion') {
+            $this->getLogger()->info('Teleporting to a region');
+            return $this->teleportToRegion($sender, $args);
+        } elseif (strtolower($command->getName()) === 'deleteregion') {
+            $this->getLogger()->info('Deleting a region');
             return true;
         }
         
@@ -70,40 +70,66 @@ class SJTMapTools extends PluginBase {
     }
 
     /**
-     * Start defining the region for a permit from the player's current location.  No arguments.
+     * Start defining the region from the player's current location.
      * 
-     * @param type $cmd The command
-     * @param type $args The command arguments
-     * @param type $issuer The issuer of the command
+     * @param CommandSender $sender The command sender object
      */
-    public function startPermitRegion($cmd, $args, $issuer) {
-        $player = $this->api->player->get($issuer->username);
-        console($issuer->username . ': ' . $args[0] . ': ' . $player->entity->x . ' ' . $player->entity->y . ' ' . $player->entity->z . ' ' . $player->entity->yaw . ' ' . $player->entity->pitch);
-        $this->config['locations'][$args[0]] = Array('x' => (int) $player->entity->x, 'y' => (int) $player->entity->y, 'z' => (int) $player->entity->z);
-        $this->api->plugin->writeYAML($this->path . 'config.yml', $this->config);
+    private function startRegion(CommandSender $sender, array $args) {
+        return true;
     }
 
     /**
-     * Teleport the player to a permit region.  Takes one argument - the permit name.
+     * Finish defining a region from the player's current location.
      * 
-     * @param type $cmd The command
-     * @param type $args The command arguments
-     * @param type $issuer The issuer of the command
+     * @param CommandSender $sender The command sender object
+     * @param array $args The arguments passed to the command
      */
-    public function teleportToPermit($cmd, $args, $issuer) {
-        if (!isset($args[1])) {
-            console('Please supply a permit name');
-            return;
+    private function endRegion(CommandSender $sender, array $args) {
+        if (!isset($args[0])) {
+            $sender->sendMessage('Please supply a region name');
+            return false;
+        }
+
+        $regionName = $args[0];
+        
+        $region = $this->regionManager->loadRegion($regionName);
+        
+        if (!is_null($region)) {
+            $sender->sendMessage('The region "' . $regionName . '" already exists.  If you no longer need this region, please delete it using the "deleteregion" command');
+            return false;
+        }
+
+        return true;
+    }
+    
+    /**
+     * Teleport the player to a region.  Takes one argument - the region name.
+     * 
+     * @param CommandSender $sender The command sender object
+     * @param array $args The arguments passed to the command
+     */
+    private function teleportToRegion(CommandSender $sender, $args) {
+        if (!isset($args[0])) {
+            $sender->sendMessage('Please supply a region name');
+            return false;
         }
         
-        $permitName = $args[1];
+        $regionName = $args[0];
         
-        // TODO Attempt to load the permit and parse the location
+        // TODO Attempt to load the region and parse the location
         $permitX = 100;
         $permitY = 100;
         $permitZ = 100;
-        console('Teleported to permit: ' . $permitName . ' at location: [' . $permitX . ', ' . $permitZ . ', ' . $permitY . ']');
-        $this->api->player->tppos($args[0], 100, 100, 100);
+        $region = $this->regionManager->loadRegion($regionName);
+        
+        if (is_null($region)) {
+            $sender->sendMessage('The region "' . $regionName . '" doesn\'t exist');
+            return false;
+        }
+        
+        $sender->sendMessage('Teleported to region: ' . $regionName . ' at location: [' . $permitX . ', ' . $permitZ . ', ' . $permitY . ']');
+        //$this->api->player->tppos($args[0], 100, 100, 100);
+        
+        return true;
     }
-    
 }
