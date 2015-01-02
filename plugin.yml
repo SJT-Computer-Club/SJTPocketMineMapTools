@@ -5,18 +5,22 @@ api: 1.0.0
 
 commands:
     startregion:
-        description: "Start a new region using the player's current location"
+        description: "Starts a new region using the player's current location"
         usage: "/startregion [player]"
         permission: myplugin.example
+    cancelregion:
+        description: "Cancels the region that\'s been started"
+        usage: "/cancelregion [player]"
+        permission: myplugin.example
     endregion:
-        description: "Finish a new region using the player's current location, defining the region name"
+        description: "Finishes defining a new region using the player's current location, specifying the region name"
         usage: "/endregion <regionname> [player]"
         permission: myplugin.example
     tptoregion:
-        description: "Teleport player to a named region"
+        description: "Teleports player to a named region"
         usage: "/tptoregion <regionname> [player]"
         permission: myplugin.example
     deleteregion:
-        description: "Delete a named region"
+        description: "Deletes a named region"
         usage: "/deleteregion <regionname> [player]"
         permission: myplugin.example
