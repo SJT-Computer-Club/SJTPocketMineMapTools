@@ -11,12 +11,30 @@ use pocketmine\command\CommandSender;
  * region to a user, storing of data and loading of data.
  */
 class RegionManager {
+    /**
+     * The location of the Git repository containing region data
+     * @var type string
+     */
     private static $gitRepo = 'https://github.com/SJT-Computer-Club/SJTPocketMineMapRegions.git';
+    /**
+     * The data folder for storing regions
+     * @var type string
+     */
     private $dataFolder;
+    /**
+     * An associative array of all Region objects
+     * @var type array of Regions
+     */
     private $regions = array();
+    /**
+     * An associative array containing all regions that are in the process of being defined by users. key=username, value=array of start coordinates
+     * @var type array
+     */
     private $underway = array();
     
-    /** Error codes for return values */
+    /**
+     *  Error codes for return values
+     */
     const NO_ERROR = 0,
           ERROR_REGION_END_WITHOUT_START = -1,
           ERROR_REGION_EXISTS = -2,
@@ -26,7 +44,7 @@ class RegionManager {
     /**
      * Constructor
      * 
-     * @param string $dataFolder The plugin's data folder
+     * @param string $dataFolder The regions data folder
      */
     function __construct($dataFolder) {
         $this->dataFolder = $dataFolder;
@@ -42,7 +60,7 @@ class RegionManager {
             GitTools::gitClone($this->dataFolder, self::$gitRepo);
         }
         
-        // TODO load all regions from folder
+        // TODO load all regions
     }
 
     /**

@@ -10,11 +10,16 @@ use pocketmine\command\CommandSender;
  * Main plugin class
  */
 class SJTMapTools extends PluginBase {
-
+    /**
+     * A static reference to this plugin instance
+     * @var type SJTMapTools
+     */
     public static $instance;
-    
+    /**
+     * Our RegionManager instance
+     * @var type RegionManager
+     */
     private $regionManager;
-    private $dataFolder;
     
     /**
      * Called when the plugin is enabled
@@ -23,7 +28,7 @@ class SJTMapTools extends PluginBase {
         self::$instance = $this;
         $this->getLogger()->info('Plugin Enabled');
         $this->initDataFolder();
-        $this->regionManager = new RegionManager($this->dataFolder . 'regions/');
+        $this->regionManager = new RegionManager($this->getDataFolder() . 'regions/');
     }
 
     /**
@@ -36,10 +41,10 @@ class SJTMapTools extends PluginBase {
 
     /* Data handling */
     private function initDataFolder() {
-        $this->dataFolder = $this->getDataFolder() . 'data/';
-        if (!is_dir($this->dataFolder)) {
-            $this->getLogger()->info('Data folder not found, creating at: ' . $this->dataFolder);
-            mkdir($this->dataFolder, 0755, true);
+        $dataFolder = $this->getDataFolder();
+        if (!is_dir($dataFolder)) {
+            $this->getLogger()->info('Data folder not found, creating at: ' . $dataFolder);
+            mkdir($dataFolder, 0755, true);
         }
     }
     

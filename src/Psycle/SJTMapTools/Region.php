@@ -6,11 +6,21 @@ namespace Psycle\SJTMapTools;
  * A container for a region of data in the map
  */
 class Region {
+    /**
+     * The name of the region
+     * @var type string
+     */
     public $name;
+    /**
+     * The coordinates of the start and end points defining the region
+     * @var type int
+     */
     public $x1, $z1, $y1, $x2, $z2, $y2;
-    
+    /**
+     * The path to the regions data folder
+     * @var type string
+     */
     private $dataFolder;
-    private $data = array();
     
     function __construct($name, $userName, $x1, $z1, $y1, $x2, $z2, $y2, $dataFolder) {
         print('Created region: ' . $name . ' ' . $userName . ' ' .  $x1 . ' ' .  $z1 . ' ' .  $y1 . ' ' .  $x2 . ' ' .  $z2 . ' ' .  $y2);
@@ -26,21 +36,27 @@ class Region {
     }
     
     /**
-     * Write the region data to disk
+     * Write our region data to disk.  This writes both region metadata and 
+     * the Minecraft data from the map.
      * 
      * @param boolean $createRevision If true, also push to Git
      * @return boolean true if successful
      */
     public function write($createRevision) {
+        // TODO write region metadata
+        // TODO write region Minecraft data
         return true;
     }
     
     /**
-     * Read region data from disk
+     * Read our region data from disk.  This reads the region metadata and 
+     * the Minecraft data into the map.
      * 
-     * @return boolean
+     * @return boolean true if successful
      */
     public function read() {
+        // TODO read region metadata
+        // TODO read region Minecraft data
         return true;
     }
 }

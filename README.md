@@ -8,4 +8,4 @@ To run this plugin during development (i.e. non-Phar), first install the Officia
 For development, clone the plugin code to `[PocketMine Folder]/plugins/SJTMapToolsSource`
 For production, install the phar file at `[PocketMine Folder]/plugins/SJTMapTools.phar`
 
-On first run, the plugin will create a folder `[PocketMine Folder]/plugins/SJTMapTools` and will also clone the regions repository into `[PocketMine Folder]/plugins/SJTMapTools/data/regions`
+On first run, the plugin will create a folder `[PocketMine Folder]/plugins/SJTMapTools` and will also clone the regions repository into `[PocketMine Folder]/plugins/SJTMapTools/regions`
