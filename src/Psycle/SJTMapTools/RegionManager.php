@@ -68,16 +68,16 @@ class RegionManager {
      * 
      * @param string $userName The user's name
      * @param int $x The x coordinate of the region start
+     * @param int $y The y coordinate of the region start
      * @param int $z The z coordinate of the region start
-     * @param int $y The x coordinate of the region start
      * @return int NO_ERROR or an error code
      */
-    public function startRegion($userName, $x, $z, $y) {
+    public function startRegion($userName, $x, $y, $z) {
         if (array_key_exists($userName, $this->underway)) {
             return self::ERROR_REGION_ALREADY_STARTED;
         }
         
-        $this->underway[$userName] = [$x, $z, $y];
+        $this->underway[$userName] = [$x, $y, $z];
         return self::NO_ERROR;
     }
     
@@ -102,11 +102,11 @@ class RegionManager {
      * @param string $userName The user's name
      * @param string $regionName The region's name
      * @param int $x The x coordinate of the region start
+     * @param int $y The y coordinate of the region start
      * @param int $z The z coordinate of the region start
-     * @param int $y The x coordinate of the region start
      * @return int NO_ERROR or an error code
      */
-    public function endRegion($userName, $regionName, $x, $z, $y) {
+    public function endRegion($userName, $regionName, $x, $y, $z) {
         if (!array_key_exists($userName, $this->underway)) {
             return self::ERROR_REGION_END_WITHOUT_START;
         }
@@ -117,7 +117,7 @@ class RegionManager {
         $startData = $this->underway[$userName];
         unset($this->underway[$userName]);
         
-        $this->regions[$regionName] = new Region($regionName, $userName, $startData[0], $startData[1], $startData[2], $x, $z, $y, $this->dataFolder);
+        $this->regions[$regionName] = new Region($regionName, $userName, $startData[0], $startData[1], $startData[2], $x, $y, $z, $this->dataFolder);
         $this->regions[$regionName]->write(true);
         return self::NO_ERROR;
     }

@@ -15,22 +15,22 @@ class Region {
      * The coordinates of the start and end points defining the region
      * @var type int
      */
-    public $x1, $z1, $y1, $x2, $z2, $y2;
+    public $x1, $y1, $z1, $x2, $y2, $z2;
     /**
      * The path to the regions data folder
      * @var type string
      */
     private $dataFolder;
     
-    function __construct($name, $userName, $x1, $z1, $y1, $x2, $z2, $y2, $dataFolder) {
-        print('Created region: ' . $name . ' ' . $userName . ' ' .  $x1 . ' ' .  $z1 . ' ' .  $y1 . ' ' .  $x2 . ' ' .  $z2 . ' ' .  $y2);
+    function __construct($name, $userName, $x1, $y1, $z1, $x2, $y2, $z2, $dataFolder) {
+        print('Created region: ' . $name . ' ' . $userName . ' ' .  $x1 . ' ' .  $y1 . ' ' .  $z1 . ' ' .  $x2 . ' ' .  $y2 . ' ' .  $z2);
         $this->name = $name;
         $this->x1 = $x1;
-        $this->z1 = $z1;
         $this->y1 = $y1;
+        $this->z1 = $z1;
         $this->x2 = $x2;
-        $this->z2 = $z2;
         $this->y2 = $y2;
+        $this->z2 = $z2;
         $this->dataFolder = $dataFolder;
         // TODO store initial data in object
     }
