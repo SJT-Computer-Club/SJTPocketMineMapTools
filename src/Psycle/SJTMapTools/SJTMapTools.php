@@ -40,6 +40,10 @@ class SJTMapTools extends PluginBase {
 
 
     /* Data handling */
+    
+    /**
+     * Create the data folder structure
+     */
     private function initDataFolder() {
         $dataFolder = $this->getDataFolder();
         if (!is_dir($dataFolder)) {
