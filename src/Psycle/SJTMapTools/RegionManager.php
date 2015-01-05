@@ -39,7 +39,7 @@ class RegionManager {
     private function parseDataFolder() {
         if (!is_dir($this->dataFolder)) {
             SJTMapTools::$instance->getLogger()->info('The regions folder doesn\'t exist.  Cloning from ' . self::$gitRepo . '…');
-            GitTools::gitClone(SJTMapTools::$instance, $this->dataFolder, self::$gitRepo);
+            GitTools::gitClone($this->dataFolder, self::$gitRepo);
         }
         
         // TODO load all regions from folder
