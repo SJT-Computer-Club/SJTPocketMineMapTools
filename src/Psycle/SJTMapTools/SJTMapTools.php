@@ -4,8 +4,8 @@ namespace Psycle\SJTMapTools;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\math\Vector3;
 use pocketmine\plugin\PluginBase;
-use pocketmine\Server;
 
 /**
  * Main plugin class
@@ -30,7 +30,7 @@ class SJTMapTools extends PluginBase {
         $this->getLogger()->info('Plugin Enabled');
         $this->initDataFolder();
         $this->regionManager = new RegionManager($this->getDataFolder() . 'regions/');
-        Server::getInstance()->getScheduler()->scheduleRepeatingTask(new EveryMinuteTask($this), 60 * 20);
+        $this->getServer()->getScheduler()->scheduleRepeatingTask(new EveryMinuteTask($this), 60 * 20);
     }
 
     /**
@@ -192,20 +192,15 @@ class SJTMapTools extends PluginBase {
         }
 
         $regionName = $args[0];
-
-        // TODO Attempt to load the region and parse the location
-        $permitX = 100;
-        $permitY = 100;
-        $permitZ = 100;
-        $region = $this->regionManager->loadRegion($regionName);
+        $region = $this->regionManager->getRegion($regionName);
 
         if (is_null($region)) {
             $sender->sendMessage('The region "' . $regionName . '" doesn\'t exist');
             return false;
         }
 
-        $sender->sendMessage('Teleported to region: ' . $regionName . ' at location: [' . $permitX . ', ' . $permitZ . ', ' . $permitY . ']');
-        //$this->api->player->tppos($args[0], 100, 100, 100);
+        $this->getLogger()->info('Teleported to region: ' . $regionName . ' at location: [' . $region->x1 . ', ' . $region->y2 . ', ' . $region->z1 . ']');
+        $player->teleport(new Vector3($region->x1, $region->y2, $region->z1));
 
         return true;
     }

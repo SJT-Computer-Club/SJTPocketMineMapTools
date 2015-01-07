@@ -3,7 +3,6 @@
 namespace Psycle\SJTMapTools;
 
 use pocketmine\block\Gold;
-use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\Server;
 

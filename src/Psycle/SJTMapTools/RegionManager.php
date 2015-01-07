@@ -123,7 +123,17 @@ class RegionManager {
         return self::NO_ERROR;
     }
 
-    public function loadRegion($regionName) {
-        return null;
+    /**
+     * Get a region by name
+     *
+     * @param string $regionName The name of the region
+     * @return Region the Region, or NULL if no region found
+     */
+    public function getRegion($regionName) {
+        if (!array_key_exists($regionName, $this->regions)) {
+            return NULL;
+        } else {
+            return $this->regions[$regionName];
+        }
     }
 }
