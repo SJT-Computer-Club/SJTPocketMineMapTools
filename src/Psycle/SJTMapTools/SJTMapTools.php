@@ -2,9 +2,10 @@
 
 namespace Psycle\SJTMapTools;
 
-use pocketmine\plugin\PluginBase;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\plugin\PluginBase;
+use pocketmine\Server;
 
 /**
  * Main plugin class
@@ -20,7 +21,7 @@ class SJTMapTools extends PluginBase {
      * @var type RegionManager
      */
     private $regionManager;
-    
+
     /**
      * Called when the plugin is enabled
      */
@@ -41,7 +42,7 @@ class SJTMapTools extends PluginBase {
 
 
     /* Data handling */
-    
+
     /**
      * Create the data folder structure
      */
@@ -52,12 +53,12 @@ class SJTMapTools extends PluginBase {
             mkdir($dataFolder, 0755, true);
         }
     }
-    
+
     /* Command handling */
-    
+
     /**
      * Handle a command from a player
-     * 
+     *
      * @param CommandSender $sender The command sender object
      * @param Command $command The command object
      * @param type $label
@@ -82,20 +83,20 @@ class SJTMapTools extends PluginBase {
                 $this->getLogger()->info($sender->getName() . ' called deleteregion');
                 return true;
         }
-        
+
         return false;
     }
 
     /**
      * Start defining the region from the player's current location.
-     * 
+     *
      * @param CommandSender $sender The command sender object
      * @param array $args The arguments passed to the command
      * @return boolean True if successful
     */
     private function startRegion(CommandSender $sender, array $args) {
         $player = $this->getServer()->getPlayer($sender->getName());
-        
+
         if (!$player) {
             $sender->sendMessage('The player "' . $sender->getName() . '" doesn\'t exist.  Are you trying to run startregion from the console?');
             return false;
@@ -109,7 +110,7 @@ class SJTMapTools extends PluginBase {
                 $this->getLogger()->info('startregion failed, ' . $sender->getName() . ' has already started a region');
                 return false;
         }
-        
+
         return true;
     }
 
@@ -121,27 +122,27 @@ class SJTMapTools extends PluginBase {
      */
     private function cancelRegion(CommandSender $sender, array $args) {
         $result = $this->regionManager->cancelRegion($sender->getName());
-        
+
         switch ($result) {
             case RegionManager::ERROR_REGION_NOT_STARTED:
                 $sender->sendMessage('You have not started defining a region, nothing to cancel');
                 $this->getLogger()->info('cancelregion failed, ' . $sender->getName() . ' has not started defining a region');
                 return false;
         }
-        
+
         return true;
     }
-    
+
     /**
      * Finish defining a region from the player's current location.
-     * 
+     *
      * @param CommandSender $sender The command sender object
      * @param array $args The arguments passed to the command
      * @return boolean True if successful
      */
     private function endRegion(CommandSender $sender, array $args) {
         $player = $this->getServer()->getPlayer($sender->getName());
-        
+
         if (!$player) {
             $sender->sendMessage('The player "' . $sender->getName() . '" doesn\'t exist.  Are you trying to run endregion from the console?');
             return false;
@@ -152,10 +153,10 @@ class SJTMapTools extends PluginBase {
             $this->getLogger()->info('endregion failed, ' . $sender->getName() . ' did not specify a region name');
             return false;
         }
-        
-        
+
+
         $result = $this->regionManager->endRegion($sender->getName(), $args[0], $player->x, $player->z, $player->y);
-        
+
         switch ($result) {
             case RegionManager::ERROR_REGION_EXISTS:
                 $sender->sendMessage('The region "' . $args[0] . '" already exists.  If you no longer need this region, delete it using deleteregion');
@@ -166,19 +167,19 @@ class SJTMapTools extends PluginBase {
                 $this->getLogger()->info('endregion failed, ' . $sender->getName() . ' has not started a region');
                 return false;
         }
-        
+
         return true;
     }
-    
+
     /**
      * Teleport the player to a region.  Takes one argument - the region name.
-     * 
+     *
      * @param CommandSender $sender The command sender object
      * @param array $args The arguments passed to the command
      */
     private function tptoregion(CommandSender $sender, $args) {
         $player = $this->getServer()->getPlayer($sender->getName());
-        
+
         if (!$player) {
             $sender->sendMessage('The player "' . $sender->getName() . '" doesn\'t exist.  Are you trying to run tptoregion from the console?');
             return false;
@@ -189,23 +190,23 @@ class SJTMapTools extends PluginBase {
             $this->getLogger()->info('tptoregion failed, ' . $sender->getName() . ' did not specify a region name');
             return false;
         }
-        
+
         $regionName = $args[0];
-        
+
         // TODO Attempt to load the region and parse the location
         $permitX = 100;
         $permitY = 100;
         $permitZ = 100;
         $region = $this->regionManager->loadRegion($regionName);
-        
+
         if (is_null($region)) {
             $sender->sendMessage('The region "' . $regionName . '" doesn\'t exist');
             return false;
         }
-        
+
         $sender->sendMessage('Teleported to region: ' . $regionName . ' at location: [' . $permitX . ', ' . $permitZ . ', ' . $permitY . ']');
         //$this->api->player->tppos($args[0], 100, 100, 100);
-        
+
         return true;
     }
 }
