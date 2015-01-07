@@ -29,6 +29,7 @@ class SJTMapTools extends PluginBase {
         $this->getLogger()->info('Plugin Enabled');
         $this->initDataFolder();
         $this->regionManager = new RegionManager($this->getDataFolder() . 'regions/');
+        Server::getInstance()->getScheduler()->scheduleRepeatingTask(new EveryMinuteTask($this), 60 * 20);
     }
 
     /**
