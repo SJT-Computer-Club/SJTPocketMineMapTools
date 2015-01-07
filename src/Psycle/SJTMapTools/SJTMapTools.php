@@ -2,9 +2,10 @@
 
 namespace Psycle\SJTMapTools;
 
-use pocketmine\plugin\PluginBase;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\plugin\PluginBase;
+use pocketmine\Server;
 
 class SJTMapTools extends PluginBase {
 
@@ -13,6 +14,7 @@ class SJTMapTools extends PluginBase {
      */
     public function onEnable() {
         $this->getLogger()->info("SJTMapTools Plugin Enabled");
+        Server::getInstance()->getScheduler()->scheduleRepeatingTask(new EveryMinuteTask($this), 60 * 20);
     }
 
     /**
@@ -25,34 +27,34 @@ class SJTMapTools extends PluginBase {
 
     /**
      * Handle a command from a player
-     * 
+     *
      * @param \Psycle\SJTMapTools\CommandSender $sender The command sender object
      * @param \Psycle\SJTMapTools\Command $command The command object
-     * @param type $label 
+     * @param type $label
      * @param array $args The command arguments
      * @return boolean
      */
     public function onCommand(CommandSender $sender, Command $command, $label, array $args) {
         if (strtolower($command->getName()) === "startpermit") {
             $this->getLogger()->info("Starting a permit region");
-            
+
             return true;
         } elseif (strtolower($command->getName()) === "endpermit") {
             $this->getLogger()->info("Ending a permit region");
-            
+
             return true;
         } elseif (strtolower($command->getName()) === "teleporttopermit") {
             $this->getLogger()->info("Teleporting to a permit region");
-            
+
             return true;
         }
-        
+
         return false;
     }
 
     /**
      * Start defining the region for a permit from the player's current location.  No arguments.
-     * 
+     *
      * @param type $cmd The command
      * @param type $args The command arguments
      * @param type $issuer The issuer of the command
@@ -66,7 +68,7 @@ class SJTMapTools extends PluginBase {
 
     /**
      * Teleport the player to a permit region.  Takes one argument - the permit name.
-     * 
+     *
      * @param type $cmd The command
      * @param type $args The command arguments
      * @param type $issuer The issuer of the command
@@ -76,9 +78,9 @@ class SJTMapTools extends PluginBase {
             console('Please supply a permit name');
             return;
         }
-        
+
         $permitName = $args[1];
-        
+
         // TODO Attempt to load the permit and parse the location
         $permitX = 100;
         $permitY = 100;
@@ -86,5 +88,5 @@ class SJTMapTools extends PluginBase {
         console('Teleported to permit: ' . $permitName . ' at location: [' . $permitX . ', ' . $permitZ . ', ' . $permitY . ']');
         $this->api->player->tppos($args[0], 100, 100, 100);
     }
-    
+
 }
