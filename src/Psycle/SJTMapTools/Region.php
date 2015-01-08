@@ -27,8 +27,11 @@ class Region {
      */
     private $dataFolder;
 
+    const DATA_ITEM_SEP = " ";
+    const DATA_LINE_SEP = "\n";
+    const DATA_HEADER_SEP = "----------";
+
     function __construct($name, $userName, $x1, $y1, $z1, $x2, $y2, $z2, $dataFolder) {
-        print('Created region: ' . $name . ' ' . $userName . ' ' .  $x1 . ' ' .  $y1 . ' ' .  $z1 . ' ' .  $x2 . ' ' .  $y2 . ' ' .  $z2);
         $this->name = $name;
         $this->x1 = $x1;
         $this->y1 = $y1;
@@ -37,7 +40,8 @@ class Region {
         $this->y2 = $y2;
         $this->z2 = $z2;
         $this->dataFolder = $dataFolder;
-        // TODO store initial data in object
+
+        $this->captureCurrentState();
     }
 
     /**
@@ -57,7 +61,7 @@ class Region {
      * @param boolean $createRevision If true, also push to Git
      * @return boolean true if successful
      */
-    public function write($createRevision) {
+    public function write($createRevision = true) {
         // TODO write region metadata
         // TODO write region Minecraft data
         return true;
@@ -88,5 +92,29 @@ class Region {
         $level->setBlock(new Vector3($this->x2, $this->y1, $this->z2), new Gold());
         $level->setBlock(new Vector3($this->x1, $this->y2, $this->z2), new Gold());
         $level->setBlock(new Vector3($this->x2, $this->y2, $this->z2), new Gold());
+    }
+
+    /**
+     *
+     */
+    private function captureCurrentState($writeToDisk = true) {
+        $level = Server::getInstance()->getDefaultLevel();
+
+        $data = $this->name . self::DATA_LINE_SEP;
+        $data .= $this->x1 . self::DATA_ITEM_SEP . $this->y1 . self::DATA_ITEM_SEP . $this->z1 . self::DATA_ITEM_SEP . $this->x2 . self::DATA_ITEM_SEP . $this->y2 . self::DATA_ITEM_SEP . $this->z2 . self::DATA_LINE_SEP;
+        $data .= self::DATA_HEADER_SEP . self::DATA_LINE_SEP;
+
+        for ($y = min($this->y1, $this->y2); $y <= max($this->y1, $this->y2); $y++) {
+            for ($x = min($this->x1, $this->x2); $x <= max($this->x1, $this->x2); $x++) {
+                for ($z = min($this->z1, $this->z2); $z <= max($this->z1, $this->z2); $z++) {
+                    $data .= $level->getBlock(new Vector3($x, $y, $z))->getId() . self::DATA_ITEM_SEP;
+                }
+                $data .= self::DATA_LINE_SEP;
+            }
+            $data .= self::DATA_LINE_SEP;
+        }
+        $data .= self::DATA_LINE_SEP;
+
+        SJTMapTools::getInstance()->getLogger()->info($data);
     }
 }
