@@ -31,7 +31,7 @@ class Region {
     const DATA_LINE_SEP = "\n";
     const DATA_HEADER_SEP = "----------";
 
-    function __construct($name, $userName, $x1, $y1, $z1, $x2, $y2, $z2, $dataFolder) {
+    function __construct($name, $userName, $x1, $y1, $z1, $x2, $y2, $z2, $regionsDataFolder) {
         $this->name = $name;
         $this->x1 = $x1;
         $this->y1 = $y1;
@@ -39,9 +39,13 @@ class Region {
         $this->x2 = $x2;
         $this->y2 = $y2;
         $this->z2 = $z2;
-        $this->dataFolder = $dataFolder;
+        $this->dataFolder = $regionsDataFolder . $name . "/";
 
-        $this->captureCurrentState();
+        if (!is_dir($this->dataFolder)) {
+            mkdir($this->dataFolder, 0755, true);
+        }
+
+        $this->write();
     }
 
     /**
@@ -56,14 +60,29 @@ class Region {
 
     /**
      * Write our region data to disk.  This writes both region metadata and
-     * the Minecraft data from the map.
+     * the Minecraft data from the map.  It will add the data file to Git if
+     * it's not already tracked, and will commit a revision.
      *
-     * @param boolean $createRevision If true, also push to Git
+     * @param string $data The data to write
      * @return boolean true if successful
      */
-    public function write($createRevision = true) {
-        // TODO write region metadata
-        // TODO write region Minecraft data
+    private function write() {
+        $data = $this->captureCurrentState();
+        $filePath = $this->dataFolder . "data.txt";
+
+        if (!is_file($filePath)) {
+            $needsAdd = true;
+        }
+
+        file_put_contents($filePath, $data);
+
+        if ($needsAdd) {
+            GitTools::gitAdd($filePath);
+            GitTools::gitCommit($filePath, "Initial commit of region '" . $this->name . "'");
+        } else{
+            GitTools::gitCommit($filePath, "Update to region '" . $this->name . "'");
+        }
+
         return true;
     }
 
@@ -95,9 +114,12 @@ class Region {
     }
 
     /**
+     * Collect the current state of the region from the server.
      *
+     * @return string The data, starting with a header containing the region
+     * name and bounding coordinates, followed by the data.
      */
-    private function captureCurrentState($writeToDisk = true) {
+    private function captureCurrentState() {
         $level = Server::getInstance()->getDefaultLevel();
 
         $data = $this->name . self::DATA_LINE_SEP;
@@ -115,6 +137,6 @@ class Region {
         }
         $data .= self::DATA_LINE_SEP;
 
-        SJTMapTools::getInstance()->getLogger()->info($data);
+        return $data;
     }
 }

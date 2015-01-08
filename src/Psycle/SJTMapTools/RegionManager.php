@@ -130,7 +130,6 @@ class RegionManager {
 
         $region = new Region($regionName, $userName, $startData[0], $startData[1], $startData[2], $x, $y, $z, $this->dataFolder);
         $this->regions[$regionName] = $region;
-        $region->write(true);
         $region->drawMarkers();
 
         return self::NO_ERROR;
