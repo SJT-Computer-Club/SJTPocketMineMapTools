@@ -5,6 +5,7 @@ namespace Psycle\SJTMapTools;
 use pocketmine\block\Gold;
 use pocketmine\math\Vector3;
 use pocketmine\Server;
+use pocketmine\utils\TextFormat;
 
 /**
  * A container for a region of data in the map
@@ -12,17 +13,17 @@ use pocketmine\Server;
 class Region {
     /**
      * The name of the region
-     * @var type string
+     * @var string
      */
     public $name;
     /**
      * The coordinates of the start and end points defining the region
-     * @var type int
+     * @var int
      */
     public $x1, $y1, $z1, $x2, $y2, $z2;
     /**
      * The path to the regions data folder
-     * @var type string
+     * @var string
      */
     private $dataFolder;
 
@@ -37,6 +38,16 @@ class Region {
         $this->z2 = $z2;
         $this->dataFolder = $dataFolder;
         // TODO store initial data in object
+    }
+
+    /**
+     * Convert to a string
+     * @return string
+     */
+    function __toString() {
+        return "Name: " . TextFormat::LIGHT_PURPLE . " " . $this->name .
+                "\n    " . TextFormat::WHITE . "1st corner: [" . TextFormat::YELLOW . (int)$this->x1 . ", " . (int)$this->y1 . ", " . (int)$this->z1 . TextFormat::WHITE . "]" .
+                "\n    " . TextFormat::WHITE . "2nd corner: [" . TextFormat::YELLOW . (int)$this->x2 . ", " . (int)$this->y2 . ", " . (int)$this->z2 . TextFormat::WHITE . "]";
     }
 
     /**
@@ -69,7 +80,7 @@ class Region {
      */
     public function drawMarkers() {
         $level = Server::getInstance()->getDefaultLevel();
-        $level->setBlockIdAt((int)$this->x1, (int)$this->y1 + 1, (int)$this->z1, 1);
+        $level->setBlock(new Vector3($this->x1, $this->y1, $this->z1), new Gold(), true);
         $level->setBlock(new Vector3($this->x2, $this->y1, $this->z1), new Gold(), true);
         $level->setBlock(new Vector3($this->x1, $this->y2, $this->z1), new Gold(), true);
         $level->setBlock(new Vector3($this->x2, $this->y2, $this->z1), new Gold(), true);

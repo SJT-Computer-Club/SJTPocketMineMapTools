@@ -67,6 +67,9 @@ class SJTMapTools extends PluginBase {
      */
     public function onCommand(CommandSender $sender, Command $command, $label, array $args) {
         switch (strtolower($command->getName())) {
+            case 'listregions':
+                $this->getLogger()->info($sender->getName() . ' called listregions');
+                return $this->listRegions($sender, $args);
             case 'startregion':
                 $this->getLogger()->info($sender->getName() . ' called startregion');
                 return $this->startRegion($sender, $args);
@@ -85,6 +88,19 @@ class SJTMapTools extends PluginBase {
         }
 
         return false;
+    }
+
+    /**
+     * List all currently defined regions.
+     *
+     * @param CommandSender $sender The command sender object
+     * @param array $args The arguments passed to the command
+     * @return boolean True if successful
+    */
+    private function listRegions(CommandSender $sender, array $args) {
+        $sender->sendMessage($this->regionManager->listRegions($sender));
+
+        return true;
     }
 
     /**
@@ -153,7 +169,6 @@ class SJTMapTools extends PluginBase {
             $this->getLogger()->info('endregion failed, ' . $sender->getName() . ' did not specify a region name');
             return false;
         }
-
 
         $result = $this->regionManager->endRegion($sender->getName(), $args[0], $player->x, $player->z, $player->y);
 

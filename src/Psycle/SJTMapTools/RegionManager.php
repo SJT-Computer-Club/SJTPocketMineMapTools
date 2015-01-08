@@ -62,6 +62,19 @@ class RegionManager {
     }
 
     /**
+     * List all regions, send list to the CommandSender (player / console)
+     *
+     * @param CommandSender $sender The command sender object
+     */
+    public function listRegions($sender) {
+        $result = "";
+        foreach ($this->regions as $region) {
+            $result .= (string)$region . "\n";
+        }
+        return $result;
+    }
+
+    /**
      * Start defining a region for a user
      *
      * @param string $userName The user's name

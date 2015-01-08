@@ -4,6 +4,10 @@ version: 0.0.1
 api: 1.0.0
 
 commands:
+    listregions:
+        description: "Lists all defined regions"
+        usage: "/listregions"
+        permission: myplugin.example
     startregion:
         description: "Starts a new region using the player's current location"
         usage: "/startregion [player]"
