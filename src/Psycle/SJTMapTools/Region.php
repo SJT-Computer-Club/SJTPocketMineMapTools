@@ -80,13 +80,13 @@ class Region {
      */
     public function drawMarkers() {
         $level = Server::getInstance()->getDefaultLevel();
-        $level->setBlock(new Vector3($this->x1, $this->y1, $this->z1), new Gold(), true);
-        $level->setBlock(new Vector3($this->x2, $this->y1, $this->z1), new Gold(), true);
-        $level->setBlock(new Vector3($this->x1, $this->y2, $this->z1), new Gold(), true);
-        $level->setBlock(new Vector3($this->x2, $this->y2, $this->z1), new Gold(), true);
-        $level->setBlock(new Vector3($this->x1, $this->y1, $this->z2), new Gold(), true);
-        $level->setBlock(new Vector3($this->x2, $this->y1, $this->z2), new Gold(), true);
-        $level->setBlock(new Vector3($this->x1, $this->y2, $this->z2), new Gold(), true);
-        $level->setBlock(new Vector3($this->x2, $this->y2, $this->z2), new Gold(), true);
+        $level->setBlock(new Vector3($this->x1, $this->y1, $this->z1), new Gold());
+        $level->setBlock(new Vector3($this->x2, $this->y1, $this->z1), new Gold());
+        $level->setBlock(new Vector3($this->x1, $this->y2, $this->z1), new Gold());
+        $level->setBlock(new Vector3($this->x2, $this->y2, $this->z1), new Gold());
+        $level->setBlock(new Vector3($this->x1, $this->y1, $this->z2), new Gold());
+        $level->setBlock(new Vector3($this->x2, $this->y1, $this->z2), new Gold());
+        $level->setBlock(new Vector3($this->x1, $this->y2, $this->z2), new Gold());
+        $level->setBlock(new Vector3($this->x2, $this->y2, $this->z2), new Gold());
     }
 }
