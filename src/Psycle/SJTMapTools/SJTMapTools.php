@@ -118,7 +118,7 @@ class SJTMapTools extends PluginBase {
             return false;
         }
 
-        $result = $this->regionManager->startRegion($sender->getName(), $player->x, $player->z, $player->y);
+        $result = $this->regionManager->startRegion($sender->getName(), $player->x, $player->y, $player->z);
 
         switch ($result) {
             case RegionManager::ERROR_REGION_ALREADY_STARTED:
@@ -170,7 +170,7 @@ class SJTMapTools extends PluginBase {
             return false;
         }
 
-        $result = $this->regionManager->endRegion($sender->getName(), $args[0], $player->x, $player->z, $player->y);
+        $result = $this->regionManager->endRegion($sender->getName(), $args[0], $player->x, $player->y, $player->z);
 
         switch ($result) {
             case RegionManager::ERROR_REGION_EXISTS:
