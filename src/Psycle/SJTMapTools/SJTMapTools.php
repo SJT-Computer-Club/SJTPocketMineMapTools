@@ -15,7 +15,7 @@ class SJTMapTools extends PluginBase {
      * A static reference to this plugin instance
      * @var type SJTMapTools
      */
-    public static $instance;
+    private static $instance;
     /**
      * Our RegionManager instance
      * @var type RegionManager
@@ -40,6 +40,13 @@ class SJTMapTools extends PluginBase {
         $this->getLogger()->info('Plugin Disabled');
     }
 
+    /**
+     * Returns the plugin instance
+     * @return SJTMapTools The plugin instance
+     */
+    public static function getInstance() {
+        return self::$instance;
+    }
 
     /* Data handling */
 
