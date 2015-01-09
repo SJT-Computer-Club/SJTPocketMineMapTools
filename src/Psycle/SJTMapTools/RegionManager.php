@@ -112,9 +112,9 @@ class RegionManager {
      *
      * @param string $userName The user's name
      * @param string $regionName The region's name
-     * @param int $x The x coordinate of the region start
-     * @param int $y The y coordinate of the region start
-     * @param int $z The z coordinate of the region start
+     * @param int $x The x coordinate of the region end
+     * @param int $y The y coordinate of the region end
+     * @param int $z The z coordinate of the region end
      * @return int NO_ERROR or an error code
      */
     public function endRegion($userName, $regionName, $x, $y, $z) {

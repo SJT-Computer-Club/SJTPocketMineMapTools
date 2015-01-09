@@ -2,6 +2,7 @@
 
 namespace Psycle\SJTMapTools;
 
+use pocketmine\block\Block;
 use pocketmine\block\Gold;
 use pocketmine\math\Vector3;
 use pocketmine\Server;
@@ -45,13 +46,12 @@ class Region {
         $this->y2 = $y2;
         $this->z2 = $z2;
         $this->dataFolder = $regionsDataFolder . $name . "/";
-        $this->lastEditUsername = $userName;
 
         if (!is_dir($this->dataFolder)) {
             mkdir($this->dataFolder, 0755, true);
         }
 
-        $this->write();
+        $this->write($userName);
     }
 
     /**
@@ -69,10 +69,12 @@ class Region {
      * the Minecraft data from the map.  It will add the data file to Git if
      * it's not already tracked, and will commit a revision.
      *
-     * @param string $data The data to write
+     * @param string $userName The user name
      * @return boolean true if successful
      */
-    private function write() {
+    public function write($userName) {
+        $this->lastEditUsername = $userName;
+
         $data = $this->captureCurrentState();
         $filePath = $this->dataFolder . "data.txt";
         $needsAdd = !is_file($filePath);
@@ -90,14 +92,19 @@ class Region {
     }
 
     /**
-     * Read our region data from disk.  This reads the region metadata and
-     * the Minecraft data into the map.
+     * Revert the region in game to the last saved state.
      *
+     * @param string $userName The user name
      * @return boolean true if successful
      */
-    public function read() {
-        // TODO read region metadata
-        // TODO read region Minecraft data
+    public function revert($userName) {
+        $this->lastEditUsername = $userName;
+
+        $filePath = $this->dataFolder . "data.txt";
+        $data = file_get_contents($filePath);
+
+        $this->restoreCurrentState($data);
+
         return true;
     }
 
@@ -141,5 +148,38 @@ class Region {
         $data .= self::DATA_LINE_SEP;
 
         return $data;
+    }
+
+    /**
+     * Restore the current state of the region from the passed data.
+     *
+     * @param string $data The data, starting with a header containing the region
+     * name and bounding coordinates, followed by the data.
+     */
+    private function restoreCurrentState($data) {
+        $level = Server::getInstance()->getDefaultLevel();
+
+        $lines = explode(self::DATA_LINE_SEP, $data);
+        $currentLine = 0;
+
+        $currentLine++; // Skip name line, we don't load that
+        $coords = explode(self::DATA_ITEM_SEP, $lines[$currentLine]);
+        $this->x1 = $coords[0]; $this->y1 = $coords[1]; $this->z1 = $coords[2];
+        $this->x2 = $coords[3]; $this->y2 = $coords[4]; $this->z2 = $coords[5];
+        $currentLine++;
+        $currentLine++; // Skip header separator line
+
+        for ($y = min($this->y1, $this->y2); $y <= max($this->y1, $this->y2); $y++) {
+            for ($x = min($this->x1, $this->x2); $x <= max($this->x1, $this->x2); $x++) {
+                $lineData = explode(self::DATA_ITEM_SEP, $lines[$currentLine]);
+                $currentItem = 0;
+                for ($z = min($this->z1, $this->z2); $z <= max($this->z1, $this->z2); $z++) {
+                    $level->setBlock(new Vector3($x, $y, $z), new Block($lineData[$currentItem]));
+                    $currentItem++;
+                }
+                $currentLine++;
+            }
+            $currentLine++;
+        }
     }
 }
