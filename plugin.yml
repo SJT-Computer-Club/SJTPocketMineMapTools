@@ -28,3 +28,11 @@ commands:
         description: "Deletes a named region"
         usage: "/deleteregion <regionname> [player]"
         permission: myplugin.example
+    saveregion:
+        description: "Saves a snapshot of the region to disk and commits a revision"
+        usage: "/saveregion <regionname>"
+        permission: myplugin.example
+    revertregion:
+        description: "Reverts the content of a region to the last saved version"
+        usage: "/revertregion <regionname>"
+        permission: myplugin.example

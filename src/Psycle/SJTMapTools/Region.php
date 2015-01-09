@@ -2,6 +2,7 @@
 
 namespace Psycle\SJTMapTools;
 
+use pocketmine\block\Block;
 use pocketmine\block\Gold;
 use pocketmine\math\Vector3;
 use pocketmine\Server;
@@ -36,26 +37,71 @@ class Region {
     const DATA_LINE_SEP = "\n";
     const DATA_HEADER_SEP = "----------";
 
-    function __construct($name, $userName, $x1, $y1, $z1, $x2, $y2, $z2, $regionsDataFolder) {
+    /**
+     * Constructor.
+     *
+     * @param type $name The region name
+     * @param type $regionsDataFolder The folder where regions are stored
+     */
+    protected function __construct($name, $regionsDataFolder) {
         $this->name = $name;
-        $this->x1 = $x1;
-        $this->y1 = $y1;
-        $this->z1 = $z1;
-        $this->x2 = $x2;
-        $this->y2 = $y2;
-        $this->z2 = $z2;
         $this->dataFolder = $regionsDataFolder . $name . "/";
-        $this->lastEditUsername = $userName;
 
         if (!is_dir($this->dataFolder)) {
             mkdir($this->dataFolder, 0755, true);
         }
+    }
 
-        $this->write();
+    /**
+     * Create a Region instance using data from the world.  This is typically
+     * used when a user creates a new region.  Take a snapshot of the current
+     * state of the world and write them to file, creating a Git revision.
+     *
+     * @param type $name The region name
+     * @param type $regionsDataFolder The folder where regions are stored
+     * @param type $userName The user name
+     * @param int $x1 The x coordinate of the region start
+     * @param int $y1 The y coordinate of the region start
+     * @param int $z1 The z coordinate of the region start
+     * @param int $x2 The x coordinate of the region end
+     * @param int $y2 The y coordinate of the region end
+     * @param int $z2 The z coordinate of the region end
+     * @return \self
+     */
+    static function fromWorld($name, $regionsDataFolder, $userName, $x1, $y1, $z1, $x2, $y2, $z2) {
+        $instance = new self($name, $regionsDataFolder);
+
+        $instance->x1 = $x1;
+        $instance->y1 = $y1;
+        $instance->z1 = $z1;
+        $instance->x2 = $x2;
+        $instance->y2 = $y2;
+        $instance->z2 = $z2;
+
+        $instance->write($userName);
+
+        return $instance;
+    }
+
+    /**
+     * Create a Region instance using data from file.  This is typically used
+     * when loading regions on initial startup.
+     *
+     * @param type $name The region name
+     * @param type $regionsDataFolder The folder where regions are stored
+     * @return \self
+     */
+    static function fromFolder($name, $regionsDataFolder) {
+        $instance = new self($name, $regionsDataFolder);
+
+        $instance->read();
+
+        return $instance;
     }
 
     /**
      * Convert to a string
+     * 
      * @return string
      */
     function __toString() {
@@ -65,14 +111,28 @@ class Region {
     }
 
     /**
-     * Write our region data to disk.  This writes both region metadata and
+     * Read the region data from file
+     */
+    private function read() {
+        $filePath = $this->dataFolder . "data.txt";
+        if (!is_file($filePath)) { return; }
+
+        $data = file_get_contents($filePath);
+
+        $this->restoreCurrentState($data, true);
+    }
+
+    /**
+     * Write our region data to file.  This writes both region metadata and
      * the Minecraft data from the map.  It will add the data file to Git if
      * it's not already tracked, and will commit a revision.
      *
-     * @param string $data The data to write
+     * @param string $userName The user name
      * @return boolean true if successful
      */
-    private function write() {
+    public function write($userName) {
+        $this->lastEditUsername = $userName;
+
         $data = $this->captureCurrentState();
         $filePath = $this->dataFolder . "data.txt";
         $needsAdd = !is_file($filePath);
@@ -90,14 +150,19 @@ class Region {
     }
 
     /**
-     * Read our region data from disk.  This reads the region metadata and
-     * the Minecraft data into the map.
+     * Revert the region in game to the last saved state.
      *
+     * @param string $userName The user name
      * @return boolean true if successful
      */
-    public function read() {
-        // TODO read region metadata
-        // TODO read region Minecraft data
+    public function revert($userName) {
+        $this->lastEditUsername = $userName;
+
+        $filePath = $this->dataFolder . "data.txt";
+        $data = file_get_contents($filePath);
+
+        $this->restoreCurrentState($data);
+
         return true;
     }
 
@@ -117,7 +182,7 @@ class Region {
     }
 
     /**
-     * Collect the current state of the region from the server.
+     * Collect the current state of the region from the world.
      *
      * @return string The data, starting with a header containing the region
      * name and bounding coordinates, followed by the data.
@@ -141,5 +206,42 @@ class Region {
         $data .= self::DATA_LINE_SEP;
 
         return $data;
+    }
+
+    /**
+     * Restore the current state of the region from the passed data.
+     *
+     * @param string $data The data, starting with a header containing the region
+     * @param boolean $metadataOnly If true, only load the metadata, not blocks
+     * name and bounding coordinates, followed by the data.
+     */
+    private function restoreCurrentState($data, $metadataOnly = false) {
+        $level = Server::getInstance()->getDefaultLevel();
+
+        $lines = explode(self::DATA_LINE_SEP, $data);
+        $currentLine = 0;
+
+        $currentLine++; // Skip name line, we don't load that
+        $coords = explode(self::DATA_ITEM_SEP, $lines[$currentLine]);
+        $this->x1 = $coords[0]; $this->y1 = $coords[1]; $this->z1 = $coords[2];
+        $this->x2 = $coords[3]; $this->y2 = $coords[4]; $this->z2 = $coords[5];
+
+        if ($metadataOnly) { return; }
+
+        $currentLine++;
+        $currentLine++; // Skip header separator line
+
+        for ($y = min($this->y1, $this->y2); $y <= max($this->y1, $this->y2); $y++) {
+            for ($x = min($this->x1, $this->x2); $x <= max($this->x1, $this->x2); $x++) {
+                $lineData = explode(self::DATA_ITEM_SEP, $lines[$currentLine]);
+                $currentItem = 0;
+                for ($z = min($this->z1, $this->z2); $z <= max($this->z1, $this->z2); $z++) {
+                    $level->setBlock(new Vector3($x, $y, $z), new Block($lineData[$currentItem]));
+                    $currentItem++;
+                }
+                $currentLine++;
+            }
+            $currentLine++;
+        }
     }
 }

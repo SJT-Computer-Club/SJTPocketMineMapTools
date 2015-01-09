@@ -70,7 +70,7 @@ class SJTMapTools extends PluginBase {
      * @param Command $command The command object
      * @param type $label
      * @param array $args The command arguments
-     * @return boolean
+     * @return boolean true if successful
      */
     public function onCommand(CommandSender $sender, Command $command, $label, array $args) {
         switch (strtolower($command->getName())) {
@@ -92,6 +92,12 @@ class SJTMapTools extends PluginBase {
             case 'deleteregion':
                 $this->getLogger()->info($sender->getName() . ' called deleteregion');
                 return true;
+            case 'saveregion':
+                $this->getLogger()->info($sender->getName() . ' called saveregion');
+                return $this->saveRegion($sender, $args);
+            case 'revertregion':
+                $this->getLogger()->info($sender->getName() . ' called revertregion');
+                return $this->revertRegion($sender, $args);
         }
 
         return false;
@@ -102,7 +108,7 @@ class SJTMapTools extends PluginBase {
      *
      * @param CommandSender $sender The command sender object
      * @param array $args The arguments passed to the command
-     * @return boolean True if successful
+     * @return boolean true if successful
     */
     private function listRegions(CommandSender $sender, array $args) {
         $sender->sendMessage($this->regionManager->listRegions($sender));
@@ -115,7 +121,7 @@ class SJTMapTools extends PluginBase {
      *
      * @param CommandSender $sender The command sender object
      * @param array $args The arguments passed to the command
-     * @return boolean True if successful
+     * @return boolean true if successful
     */
     private function startRegion(CommandSender $sender, array $args) {
         $player = $this->getServer()->getPlayer($sender->getName());
@@ -141,7 +147,7 @@ class SJTMapTools extends PluginBase {
      * Cancel defining the already started region
      * @param CommandSender $sender The command sender object
      * @param array $args
-     * @return boolean True if successful
+     * @return boolean true if successful
      */
     private function cancelRegion(CommandSender $sender, array $args) {
         $result = $this->regionManager->cancelRegion($sender->getName());
@@ -161,7 +167,7 @@ class SJTMapTools extends PluginBase {
      *
      * @param CommandSender $sender The command sender object
      * @param array $args The arguments passed to the command
-     * @return boolean True if successful
+     * @return boolean true if successful
      */
     private function endRegion(CommandSender $sender, array $args) {
         $player = $this->getServer()->getPlayer($sender->getName());
@@ -198,6 +204,7 @@ class SJTMapTools extends PluginBase {
      *
      * @param CommandSender $sender The command sender object
      * @param array $args The arguments passed to the command
+     * @return boolean true if successful
      */
     private function tptoregion(CommandSender $sender, $args) {
         $player = $this->getServer()->getPlayer($sender->getName());
@@ -221,9 +228,66 @@ class SJTMapTools extends PluginBase {
             return false;
         }
 
-        $this->getLogger()->info('Teleported to region: ' . $regionName . ' at location: [' . $region->x1 . ', ' . $region->y2 . ', ' . $region->z1 . ']');
         $player->teleport(new Vector3($region->x1, $region->y2, $region->z1));
+        $this->getLogger()->info('Teleported to region: ' . $regionName . ' at location: [' . $region->x1 . ', ' . $region->y2 . ', ' . $region->z1 . ']');
 
         return true;
     }
+
+    /**
+     * Save a region, creating a revision in the Git repo
+     *
+     * @param CommandSender $sender The command sender object
+     * @param array $args The arguments passed to the command
+     * @return boolean true if successful
+     */
+    private function saveRegion(CommandSender $sender, $args) {
+        if (!isset($args[0])) {
+            $sender->sendMessage('Please supply a region name');
+            $this->getLogger()->info('saveregion failed, ' . $sender->getName() . ' did not specify a region name');
+            return false;
+        }
+
+        $regionName = $args[0];
+        $region = $this->regionManager->getRegion($regionName);
+
+        if (is_null($region)) {
+            $sender->sendMessage('The region "' . $regionName . '" doesn\'t exist');
+            return false;
+        }
+
+        $region->write($sender->getName());
+        $this->getLogger()->info('Saved region: ' . $regionName);
+
+        return true;
+    }
+
+    /**
+     * Revert a region's content to the last saved state
+     *
+     * @param CommandSender $sender The command sender object
+     * @param array $args The arguments passed to the command
+     * @return boolean true if successful
+     */
+    private function revertRegion(CommandSender $sender, $args) {
+        if (!isset($args[0])) {
+            $sender->sendMessage('Please supply a region name');
+            $this->getLogger()->info('revertregion failed, ' . $sender->getName() . ' did not specify a region name');
+            return false;
+        }
+
+        $regionName = $args[0];
+        $region = $this->regionManager->getRegion($regionName);
+
+        if (is_null($region)) {
+            $sender->sendMessage('The region "' . $regionName . '" doesn\'t exist');
+            return false;
+        }
+
+        $region->revert($sender->getName());
+        $this->getLogger()->info('Reverted region: ' . $regionName);
+
+        return true;
+    }
+
 }

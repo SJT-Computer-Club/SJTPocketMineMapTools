@@ -58,15 +58,20 @@ class RegionManager {
             GitTools::gitClone($this->dataFolder, self::$gitRepo);
         }
 
-        // TODO load all regions
+        $directories = scandir($this->dataFolder);
+
+        foreach ($directories as $directory) {
+            if ($directory[0] === '.') { continue; }
+            $region = Region::fromFolder($directory, $this->dataFolder);
+            $this->regions[$region->name] = $region;
+            $region->drawMarkers();
+        }
     }
 
     /**
-     * List all regions, send list to the CommandSender (player / console)
-     *
-     * @param CommandSender $sender The command sender object
+     * Get a list of all regions as a string
      */
-    public function listRegions($sender) {
+    public function listRegions() {
         $result = "";
         foreach ($this->regions as $region) {
             $result .= (string)$region . "\n";
@@ -112,9 +117,9 @@ class RegionManager {
      *
      * @param string $userName The user's name
      * @param string $regionName The region's name
-     * @param int $x The x coordinate of the region start
-     * @param int $y The y coordinate of the region start
-     * @param int $z The z coordinate of the region start
+     * @param int $x The x coordinate of the region end
+     * @param int $y The y coordinate of the region end
+     * @param int $z The z coordinate of the region end
      * @return int NO_ERROR or an error code
      */
     public function endRegion($userName, $regionName, $x, $y, $z) {
@@ -128,7 +133,7 @@ class RegionManager {
         $startData = $this->underway[$userName];
         unset($this->underway[$userName]);
 
-        $region = new Region($regionName, $userName, $startData[0], $startData[1], $startData[2], $x, $y, $z, $this->dataFolder);
+        $region = Region::fromWorld($regionName, $this->dataFolder, $userName, $startData[0], $startData[1], $startData[2], $x, $y, $z);
         $this->regions[$regionName] = $region;
         $region->drawMarkers();
 
