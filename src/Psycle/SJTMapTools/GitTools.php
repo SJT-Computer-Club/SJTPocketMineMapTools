@@ -13,7 +13,7 @@ class GitTools {
      * @param string $gitPath The remote git repository URL (.git)
      */
     public static function gitClone($filePath, $gitPath) {
-        $command = 'git clone -- ' . $gitPath . ' ' . $filePath;
+        $command = 'git clone "' . $gitPath . '" "' . $filePath . '"';
         SJTMapTools::getInstance()->getLogger()->info('Executing: ' . $command);
         exec($command);
     }
@@ -26,7 +26,7 @@ class GitTools {
      */
     public static function gitAdd($filePath) {
         $pathInfo = pathinfo($filePath);
-        $command = 'cd ' . $pathInfo['dirname'] . '; git add -f -- ' . $pathInfo['basename'];
+        $command = 'cd "' . $pathInfo['dirname'] . '"; git add -f -- "' . $pathInfo['basename'] . '"';
         SJTMapTools::getInstance()->getLogger()->info('Executing: ' . $command);
         exec($command);
     }
@@ -38,7 +38,7 @@ class GitTools {
      */
     public static function gitCommit($filePath, $message) {
         $pathInfo = pathinfo($filePath);
-        $command = 'cd ' . $pathInfo['dirname'] . '; git commit -m "' . $message . '" -- ' . $pathInfo['basename'];
+        $command = 'cd "' . $pathInfo['dirname'] . '"; git commit -m "' . str_replace('"', "'", $message) . '" -- "' . $pathInfo['basename'] . '"';
         SJTMapTools::getInstance()->getLogger()->info('Executing: ' . $command);
         exec($command);
     }
@@ -50,7 +50,7 @@ class GitTools {
      */
     public static function gitPush($filePath) {
         $pathInfo = pathinfo($filePath);
-        $command = 'cd ' . $pathInfo['dirname'] . '; git push -- ' . $pathInfo['basename'];
+        $command = 'cd "' . $pathInfo['dirname'] . '"; git push -- "' . $pathInfo['basename'] . '"';
         SJTMapTools::getInstance()->getLogger()->info('Executing: ' . $command);
         exec($command);
     }

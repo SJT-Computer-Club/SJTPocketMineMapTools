@@ -26,6 +26,11 @@ class Region {
      * @var string
      */
     private $dataFolder;
+    /**
+     * The username of the user who last edited the region
+     * @var string
+     */
+    private $lastEditUsername;
 
     const DATA_ITEM_SEP = " ";
     const DATA_LINE_SEP = "\n";
@@ -40,6 +45,7 @@ class Region {
         $this->y2 = $y2;
         $this->z2 = $z2;
         $this->dataFolder = $regionsDataFolder . $name . "/";
+        $this->lastEditUsername = $userName;
 
         if (!is_dir($this->dataFolder)) {
             mkdir($this->dataFolder, 0755, true);
@@ -69,18 +75,15 @@ class Region {
     private function write() {
         $data = $this->captureCurrentState();
         $filePath = $this->dataFolder . "data.txt";
-
-        if (!is_file($filePath)) {
-            $needsAdd = true;
-        }
+        $needsAdd = !is_file($filePath);
 
         file_put_contents($filePath, $data);
 
         if ($needsAdd) {
             GitTools::gitAdd($filePath);
-            GitTools::gitCommit($filePath, "Initial commit of region '" . $this->name . "'");
+            GitTools::gitCommit($filePath, "Initial commit of region '" . $this->name . "' by " . $this->lastEditUsername);
         } else{
-            GitTools::gitCommit($filePath, "Update to region '" . $this->name . "'");
+            GitTools::gitCommit($filePath, "Update to region '" . $this->name . "' by " . $this->lastEditUsername);
         }
 
         return true;
