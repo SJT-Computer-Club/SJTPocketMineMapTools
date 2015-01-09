@@ -4,18 +4,25 @@ namespace Psycle\SJTMapTools;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\event\block\BlockPlaceEvent;
+use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\math\Vector3;
 use pocketmine\plugin\PluginBase;
+use pocketmine\utils\TextWrapper;
 
 /**
  * Main plugin class
  */
-class SJTMapTools extends PluginBase {
+class SJTMapTools extends PluginBase implements Listener {
+
     /**
      * A static reference to this plugin instance
      * @var type SJTMapTools
      */
     private static $instance;
+
     /**
      * Our RegionManager instance
      * @var type RegionManager
@@ -31,6 +38,7 @@ class SJTMapTools extends PluginBase {
         $this->initDataFolder();
         $this->regionManager = new RegionManager($this->getDataFolder() . 'regions/');
         $this->getServer()->getScheduler()->scheduleRepeatingTask(new EveryMinuteTask($this), 60 * 20);
+        $this->getServer()->getPluginManager()->registerEvents($this, $this);
     }
 
     /**
@@ -109,7 +117,7 @@ class SJTMapTools extends PluginBase {
      * @param CommandSender $sender The command sender object
      * @param array $args The arguments passed to the command
      * @return boolean true if successful
-    */
+     */
     private function listRegions(CommandSender $sender, array $args) {
         $sender->sendMessage($this->regionManager->listRegions($sender));
 
@@ -122,7 +130,7 @@ class SJTMapTools extends PluginBase {
      * @param CommandSender $sender The command sender object
      * @param array $args The arguments passed to the command
      * @return boolean true if successful
-    */
+     */
     private function startRegion(CommandSender $sender, array $args) {
         $player = $this->getServer()->getPlayer($sender->getName());
 
@@ -288,6 +296,62 @@ class SJTMapTools extends PluginBase {
         $this->getLogger()->info('Reverted region: ' . $regionName);
 
         return true;
+    }
+
+    // EVENTS
+
+    /**
+     * Handle BlockBreakEvent.
+     *
+     * @param BlockBreakEvent $event The event
+     *
+     * @priority       NORMAL
+     * @ignoreCanceled false
+     */
+    public function onBlockBreak(BlockBreakEvent $event) {
+        $player = $event->getPlayer();
+
+        if (false) {
+            return true;
+        } else {
+            $event->setCancelled();
+        }
+    }
+
+    /**
+     * Handle BlockPlaceEvent.
+     *
+     * @param BlockPlaceEvent $event The event
+     *
+     * @priority       NORMAL
+     * @ignoreCanceled false
+     */
+    public function onBlockPlace(BlockPlaceEvent $event) {
+        $player = $event->getPlayer();
+
+        if (false) {
+            return true;
+        } else {
+            $event->setCancelled();
+        }
+    }
+
+    /**
+     * Handle PlayerInteractEvent.
+     *
+     * @param BlockBreakEvent $event The event
+     *
+     * @priority       NORMAL
+     * @ignoreCanceled false
+     */
+    public function onPlayerInteract(PlayerInteractEvent $event) {
+        $player = $event->getPlayer();
+
+        if (false) {
+            return true;
+        } else {
+            $event->setCancelled();
+        }
     }
 
 }
