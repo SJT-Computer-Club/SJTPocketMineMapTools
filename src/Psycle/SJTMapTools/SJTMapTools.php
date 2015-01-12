@@ -392,7 +392,7 @@ class SJTMapTools extends PluginBase implements Listener {
     public function onBlockBreak(BlockBreakEvent $event) {
         $player = $event->getPlayer();
 
-        if (false) {
+        if ($this->regionManager->canEditBlock($player->getName(), $event->getBlock())) {
             return true;
         } else {
             $event->setCancelled();
@@ -410,7 +410,7 @@ class SJTMapTools extends PluginBase implements Listener {
     public function onBlockPlace(BlockPlaceEvent $event) {
         $player = $event->getPlayer();
 
-        if (false) {
+        if ($this->regionManager->canEditBlock($player->getName(), $event->getBlock())) {
             return true;
         } else {
             $event->setCancelled();
@@ -428,7 +428,7 @@ class SJTMapTools extends PluginBase implements Listener {
     public function onPlayerInteract(PlayerInteractEvent $event) {
         $player = $event->getPlayer();
 
-        if (false) {
+        if ($this->regionManager->canEditBlock($player->getName(), $event->getBlock())) {
             return true;
         } else {
             $event->setCancelled();

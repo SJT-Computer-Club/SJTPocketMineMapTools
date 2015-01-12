@@ -197,4 +197,19 @@ class RegionManager {
 
         return self::NO_ERROR;
     }
+
+    /**
+     * Check whether a user can edit a block
+     *
+     * @param string $userName The user's name
+     * @param Block The block the user is attempting to edit
+     * @return boolean true if block can be edited by the user
+     */
+    public function canEditBlock($userName, $block) {
+        foreach ($this->regions as $region) {
+            if ($region->getPermitUserName() !== $userName) { continue; }
+            if ($region->isBlockInside($block)) { return true; }
+        }
+        return false;
+    }
 }

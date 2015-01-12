@@ -79,12 +79,12 @@ class Region {
     static function fromWorld($name, $regionsDataFolder, $userName, $x1, $y1, $z1, $x2, $y2, $z2) {
         $instance = new self($name, $regionsDataFolder);
 
-        $instance->x1 = $x1;
-        $instance->y1 = $y1;
-        $instance->z1 = $z1;
-        $instance->x2 = $x2;
-        $instance->y2 = $y2;
-        $instance->z2 = $z2;
+        $instance->x1 = (int)$x1;
+        $instance->y1 = (int)$y1;
+        $instance->z1 = (int)$z1;
+        $instance->x2 = (int)$x2;
+        $instance->y2 = (int)$y2;
+        $instance->z2 = (int)$z2;
 
         $instance->write($userName);
 
@@ -114,8 +114,8 @@ class Region {
      */
     function __toString() {
         return "Name: " . TextFormat::LIGHT_PURPLE . " " . $this->name .
-                "\n    " . TextFormat::WHITE . "1st corner: [" . TextFormat::YELLOW . (int)$this->x1 . ", " . (int)$this->y1 . ", " . (int)$this->z1 . TextFormat::WHITE . "]" .
-                "\n    " . TextFormat::WHITE . "2nd corner: [" . TextFormat::YELLOW . (int)$this->x2 . ", " . (int)$this->y2 . ", " . (int)$this->z2 . TextFormat::WHITE . "]" .
+                "\n    " . TextFormat::WHITE . "1st corner: [" . TextFormat::YELLOW . $this->x1 . ", " . $this->y1 . ", " . $this->z1 . TextFormat::WHITE . "]" .
+                "\n    " . TextFormat::WHITE . "2nd corner: [" . TextFormat::YELLOW . $this->x2 . ", " . $this->y2 . ", " . $this->z2 . TextFormat::WHITE . "]" .
                 (!is_null($this->permitUserName) ? "\n    Permit issued to: " . TextFormat::YELLOW . $this->permitUserName : "");
 
     }
@@ -238,10 +238,10 @@ class Region {
         $currentLine++; // Skip name line, we don't load that
 
         $coords = explode(self::DATA_ITEM_SEP, $lines[$currentLine]); $currentLine++;
-        $this->x1 = $coords[0]; $this->y1 = $coords[1]; $this->z1 = $coords[2];
-        $this->x2 = $coords[3]; $this->y2 = $coords[4]; $this->z2 = $coords[5];
-        $this->lastEditUserName = $lines[$currentLine]; $currentLine++;
-        $this->permitUserName = $lines[$currentLine]; $currentLine++;
+        $this->x1 = (int)$coords[0]; $this->y1 = (int)$coords[1]; $this->z1 = (int)$coords[2];
+        $this->x2 = (int)$coords[3]; $this->y2 = (int)$coords[4]; $this->z2 = (int)$coords[5];
+        $this->lastEditUserName = ($lines[$currentLine] != "" ? $lines[$currentLine] : null); $currentLine++;
+        $this->permitUserName = ($lines[$currentLine] != "" ? $lines[$currentLine] : null); $currentLine++;
 
         if ($metadataOnly) { return; }
 
@@ -308,5 +308,17 @@ class Region {
         $this->permitUserName = null;
         $this->write($userName);
         return true;
+    }
+
+    /**
+     * Check whether a Block is inside this region
+     *
+     * @param Block $block The block to check
+     * @return boolean true if inside region
+     */
+    public function isBlockInside($block) {
+        return ($block->x >= min($this->x1, $this->x2) && $block->x <= max($this->x1, $this->x2)
+             && $block->y >= min($this->y1, $this->y2) && $block->y <= max($this->y1, $this->y2)
+             && $block->z >= min($this->z1, $this->z2) && $block->z <= max($this->z1, $this->z2));
     }
 }
