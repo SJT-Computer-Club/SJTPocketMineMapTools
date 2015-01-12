@@ -36,3 +36,12 @@ commands:
         description: "Reverts the content of a region to the last saved version"
         usage: "/revertregion <regionname>"
         permission: myplugin.example
+    requestpermit:
+        description: "Requests a permit to edit a region"
+        usage: "/requestpermit <regionname>"
+        permission: myplugin.example
+    releasepermit:
+        description: "Releases a region editing permit"
+        usage: "/releasepermit <regionname>"
+        permission: myplugin.example
+

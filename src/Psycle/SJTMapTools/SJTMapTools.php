@@ -106,6 +106,12 @@ class SJTMapTools extends PluginBase implements Listener {
             case 'revertregion':
                 $this->getLogger()->info($sender->getName() . ' called revertregion');
                 return $this->revertRegion($sender, $args);
+            case 'requestpermit':
+                $this->getLogger()->info($sender->getName() . ' called requestpermit');
+                return $this->requestPermit($sender, $args);
+            case 'releasepermit':
+                $this->getLogger()->info($sender->getName() . ' called releasepermit');
+                return $this->releasePermit($sender, $args);
         }
 
         return false;
@@ -148,6 +154,9 @@ class SJTMapTools extends PluginBase implements Listener {
                 return false;
         }
 
+        $sender->sendMessage('Region definition started');
+        $this->getLogger()->info('Region definition started');
+
         return true;
     }
 
@@ -166,6 +175,9 @@ class SJTMapTools extends PluginBase implements Listener {
                 $this->getLogger()->info('cancelregion failed, ' . $sender->getName() . ' has not started defining a region');
                 return false;
         }
+
+        $sender->sendMessage('Region definition cancelled');
+        $this->getLogger()->info('Region definition cancelled');
 
         return true;
     }
@@ -203,6 +215,9 @@ class SJTMapTools extends PluginBase implements Listener {
                 $this->getLogger()->info('endregion failed, ' . $sender->getName() . ' has not started a region');
                 return false;
         }
+
+        $sender->sendMessage('Region "' . $args[0] . '" has been defined');
+        $this->getLogger()->info('Region ' . $args[0] . ' has been defined');
 
         return true;
     }
@@ -294,6 +309,72 @@ class SJTMapTools extends PluginBase implements Listener {
 
         $region->revert($sender->getName());
         $this->getLogger()->info('Reverted region: ' . $regionName);
+
+        return true;
+    }
+
+    /**
+     * Request a permit to edit a region
+     *
+     * @param CommandSender $sender The command sender object
+     * @param array $args The arguments passed to the command
+     * @return boolean true if successful
+     */
+    private function requestPermit(CommandSender $sender, $args) {
+        if (!isset($args[0])) {
+            $sender->sendMessage('Please supply a region name');
+            $this->getLogger()->info('requestpermit failed, ' . $sender->getName() . ' did not specify a region name');
+            return false;
+        }
+
+        $result = $this->regionManager->requestPermit($sender->getName(), $args[0]);
+
+        switch ($result) {
+            case RegionManager::ERROR_REGION_DOESNT_EXIST:
+                $sender->sendMessage('The region "' . $args[0] . '" doesn\'t exist');
+                $this->getLogger()->info('requestpermit failed, ' . $sender->getName() . ' requested a region ' . $args[0] . ' which doesn\'t exist');
+                return false;
+            case RegionManager::ERROR_PERMIT_ALREADY_ISSUED:
+                $sender->sendMessage('A permit for the region "' . $args[0] . '" has already been issued');
+                $this->getLogger()->info('requestpermit failed, a permit for ' . $args[0] . ' has already been issued');
+                return false;
+        }
+
+        $sender->sendMessage('Permit for region "' . $args[0] . '" has been issued');
+        $this->getLogger()->info('Permit for region ' . $args[0] . ' has been issued');
+
+        return true;
+    }
+
+    /**
+     * Release a permit for editing a region
+     *
+     * @param CommandSender $sender The command sender object
+     * @param array $args The arguments passed to the command
+     * @return boolean true if successful
+     */
+    private function releasePermit(CommandSender $sender, $args) {
+        if (!isset($args[0])) {
+            $sender->sendMessage('Please supply a region name');
+            $this->getLogger()->info('releasepermit failed, ' . $sender->getName() . ' did not specify a region name');
+            return false;
+        }
+
+        $result = $this->regionManager->releasePermit($sender->getName(), $args[0]);
+
+        switch ($result) {
+            case RegionManager::ERROR_REGION_DOESNT_EXIST:
+                $sender->sendMessage('The region "' . $args[0] . '" doesn\'t exist');
+                $this->getLogger()->info('releasepermit failed, ' . $sender->getName() . ' requested a region ' . $args[0] . ' which doesn\'t exist');
+                return false;
+            case RegionManager::ERROR_PERMIT_NOT_ASSIGNED_TO_USER:
+                $sender->sendMessage('Another user has the permit for region "' . $args[0] . '"');
+                $this->getLogger()->info('releasepermit failed, another user has the permit for region ' . $args[0]);
+                return false;
+        }
+
+        $sender->sendMessage('Permit for region "' . $args[0] . '" has been released');
+        $this->getLogger()->info('Permit for region ' . $args[0] . ' has been released');
 
         return true;
     }

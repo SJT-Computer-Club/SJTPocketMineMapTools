@@ -31,11 +31,19 @@ class Region {
      * The username of the user who last edited the region
      * @var string
      */
-    private $lastEditUsername;
+    private $lastEditUserName = null;
+    /**
+     * The username of the user with the permit to edit the region, null if no
+     * permit issued
+     * @var string
+     */
+    private $permitUserName = null;
 
     const DATA_ITEM_SEP = " ";
     const DATA_LINE_SEP = "\n";
     const DATA_HEADER_SEP = "----------";
+
+    const FILE_VERSION = "v1.0";
 
     /**
      * Constructor.
@@ -101,13 +109,15 @@ class Region {
 
     /**
      * Convert to a string
-     * 
+     *
      * @return string
      */
     function __toString() {
         return "Name: " . TextFormat::LIGHT_PURPLE . " " . $this->name .
                 "\n    " . TextFormat::WHITE . "1st corner: [" . TextFormat::YELLOW . (int)$this->x1 . ", " . (int)$this->y1 . ", " . (int)$this->z1 . TextFormat::WHITE . "]" .
-                "\n    " . TextFormat::WHITE . "2nd corner: [" . TextFormat::YELLOW . (int)$this->x2 . ", " . (int)$this->y2 . ", " . (int)$this->z2 . TextFormat::WHITE . "]";
+                "\n    " . TextFormat::WHITE . "2nd corner: [" . TextFormat::YELLOW . (int)$this->x2 . ", " . (int)$this->y2 . ", " . (int)$this->z2 . TextFormat::WHITE . "]" .
+                (!is_null($this->permitUserName) ? "\n    Permit issued to: " . TextFormat::YELLOW . $this->permitUserName : "");
+
     }
 
     /**
@@ -131,7 +141,7 @@ class Region {
      * @return boolean true if successful
      */
     public function write($userName) {
-        $this->lastEditUsername = $userName;
+        $this->lastEditUserName = $userName;
 
         $data = $this->captureCurrentState();
         $filePath = $this->dataFolder . "data.txt";
@@ -141,9 +151,9 @@ class Region {
 
         if ($needsAdd) {
             GitTools::gitAdd($filePath);
-            GitTools::gitCommit($filePath, "Initial commit of region '" . $this->name . "' by " . $this->lastEditUsername);
+            GitTools::gitCommit($filePath, "Initial commit of region '" . $this->name . "' by " . $this->lastEditUserName);
         } else{
-            GitTools::gitCommit($filePath, "Update to region '" . $this->name . "' by " . $this->lastEditUsername);
+            GitTools::gitCommit($filePath, "Update to region '" . $this->name . "' by " . $this->lastEditUserName);
         }
 
         return true;
@@ -156,7 +166,7 @@ class Region {
      * @return boolean true if successful
      */
     public function revert($userName) {
-        $this->lastEditUsername = $userName;
+        $this->lastEditUserName = $userName;
 
         $filePath = $this->dataFolder . "data.txt";
         $data = file_get_contents($filePath);
@@ -190,8 +200,11 @@ class Region {
     private function captureCurrentState() {
         $level = Server::getInstance()->getDefaultLevel();
 
-        $data = $this->name . self::DATA_LINE_SEP;
+        $data = self::FILE_VERSION . self::DATA_LINE_SEP;
+        $data .= $this->name . self::DATA_LINE_SEP;
         $data .= $this->x1 . self::DATA_ITEM_SEP . $this->y1 . self::DATA_ITEM_SEP . $this->z1 . self::DATA_ITEM_SEP . $this->x2 . self::DATA_ITEM_SEP . $this->y2 . self::DATA_ITEM_SEP . $this->z2 . self::DATA_LINE_SEP;
+        $data .= $this->lastEditUserName . self::DATA_LINE_SEP;
+        $data .= $this->permitUserName . self::DATA_LINE_SEP;
         $data .= self::DATA_HEADER_SEP . self::DATA_LINE_SEP;
 
         for ($y = min($this->y1, $this->y2); $y <= max($this->y1, $this->y2); $y++) {
@@ -221,14 +234,17 @@ class Region {
         $lines = explode(self::DATA_LINE_SEP, $data);
         $currentLine = 0;
 
+        $currentLine++; // Skip file version line
         $currentLine++; // Skip name line, we don't load that
-        $coords = explode(self::DATA_ITEM_SEP, $lines[$currentLine]);
+
+        $coords = explode(self::DATA_ITEM_SEP, $lines[$currentLine]); $currentLine++;
         $this->x1 = $coords[0]; $this->y1 = $coords[1]; $this->z1 = $coords[2];
         $this->x2 = $coords[3]; $this->y2 = $coords[4]; $this->z2 = $coords[5];
+        $this->lastEditUserName = $lines[$currentLine]; $currentLine++;
+        $this->permitUserName = $lines[$currentLine]; $currentLine++;
 
         if ($metadataOnly) { return; }
 
-        $currentLine++;
         $currentLine++; // Skip header separator line
 
         for ($y = min($this->y1, $this->y2); $y <= max($this->y1, $this->y2); $y++) {
@@ -243,5 +259,54 @@ class Region {
             }
             $currentLine++;
         }
+    }
+
+    /**
+     * Check the user with a permit to edit this region, or null if no permit
+     *
+     * @return string the username
+     */
+    public function getPermitUserName() {
+        return $this->permitUserName;
+    }
+
+    /**
+     * Request a permit to edit the region
+     *
+     * @param string $userName The username of the user requesting the permit
+     * @return boolean true if successful
+     */
+    public function requestPermit($userName) {
+        if (!is_null($this->permitUserName)) {
+            return false;
+        }
+
+        $this->permitUserName = $userName;
+        $this->write($userName);
+        return true;
+    }
+
+    /**
+     * Release the permit to edit the region
+     *
+     * @param string $userName The username of the user requesting the release,
+     * null if the permit should be released whoever the user.
+     * @return boolean true if successful
+     */
+    public function releasePermit($userName = null) {
+        if (is_null($userName)) {
+            $userName = $this->permitUserName;
+        }
+
+        if (is_null($this->permitUserName)) {
+            return false;
+        }
+        if ($userName != $this->permitUserName) {
+            return false;
+        }
+
+        $this->permitUserName = null;
+        $this->write($userName);
+        return true;
     }
 }

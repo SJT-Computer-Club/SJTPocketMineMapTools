@@ -37,7 +37,10 @@ class RegionManager {
           ERROR_REGION_END_WITHOUT_START = -1,
           ERROR_REGION_EXISTS = -2,
           ERROR_REGION_ALREADY_STARTED = -3,
-          ERROR_REGION_NOT_STARTED = -4;
+          ERROR_REGION_NOT_STARTED = -4,
+          ERROR_REGION_DOESNT_EXIST = -5,
+          ERROR_PERMIT_ALREADY_ISSUED = -6,
+          ERROR_PERMIT_NOT_ASSIGNED_TO_USER = -7;
 
     /**
      * Constructor
@@ -152,5 +155,46 @@ class RegionManager {
         } else {
             return $this->regions[$regionName];
         }
+    }
+
+
+    /**
+     * Request a permit to edit a region
+     *
+     * @param string $userName The user's name
+     * @param string $regionName The region name
+     * @return int NO_ERROR or an eror code
+     */
+    public function requestPermit($userName, $regionName) {
+        $region = $this->getRegion($regionName);
+        if (is_null($region)) {
+            return self::ERROR_REGION_DOESNT_EXIST;
+        }
+        if (!is_null($region->getPermitUserName())) {
+            return self::ERROR_PERMIT_ALREADY_ISSUED;
+        }
+
+        $region->requestPermit($userName);
+        return self::NO_ERROR;
+    }
+
+    /**
+     * Request the release of a permit
+     *
+     * @param string $userName The user's name
+     * @param string $regionName The region name
+     * @return int NO_ERROR or an error code
+     */
+    public function releasePermit($userName, $regionName) {
+        $region = $this->getRegion($regionName);
+        if (is_null($region)) {
+            return self::ERROR_REGION_DOESNT_EXIST;
+        }
+
+        if (!$region->releasePermit($userName)) {
+            return self::ERROR_PERMIT_NOT_ASSIGNED_TO_USER;
+        }
+
+        return self::NO_ERROR;
     }
 }
