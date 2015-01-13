@@ -10,7 +10,6 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\math\Vector3;
 use pocketmine\plugin\PluginBase;
-use pocketmine\utils\TextWrapper;
 
 /**
  * Main plugin class
