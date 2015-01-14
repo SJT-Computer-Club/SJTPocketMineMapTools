@@ -7,41 +7,31 @@ commands:
     listregions:
         description: "Lists all defined regions"
         usage: "/listregions"
-        permission: myplugin.example
     startregion:
         description: "Starts a new region using the player's current location"
         usage: "/startregion [player]"
-        permission: myplugin.example
     cancelregion:
         description: "Cancels the region that\'s been started"
         usage: "/cancelregion [player]"
-        permission: myplugin.example
     endregion:
         description: "Finishes defining a new region using the player's current location, specifying the region name"
         usage: "/endregion <regionname> [player]"
-        permission: myplugin.example
     tptoregion:
         description: "Teleports player to a named region"
         usage: "/tptoregion <regionname> [player]"
-        permission: myplugin.example
     deleteregion:
         description: "Deletes a named region"
         usage: "/deleteregion <regionname> [player]"
-        permission: myplugin.example
     saveregion:
         description: "Saves a snapshot of the region to disk and commits a revision"
         usage: "/saveregion <regionname>"
-        permission: myplugin.example
     revertregion:
         description: "Reverts the content of a region to the last saved version"
         usage: "/revertregion <regionname>"
-        permission: myplugin.example
     requestpermit:
         description: "Requests a permit to edit a region"
         usage: "/requestpermit <regionname>"
-        permission: myplugin.example
     releasepermit:
         description: "Releases a region editing permit"
         usage: "/releasepermit <regionname>"
-        permission: myplugin.example
 
