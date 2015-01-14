@@ -10,6 +10,7 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\math\Vector3;
 use pocketmine\plugin\PluginBase;
+use pocketmine\Server;
 
 /**
  * Main plugin class
@@ -33,7 +34,11 @@ class SJTMapTools extends PluginBase implements Listener {
      */
     public function onEnable() {
         self::$instance = $this;
+        $level = Server::getInstance()->getDefaultLevel();
+
         $this->getLogger()->info('Plugin Enabled');
+        // TODO This should be configurable
+        $level->setSpawnLocation(new Vector3(1500, 130, 1500));
         $this->initDataFolder();
         $this->regionManager = new RegionManager($this->getDataFolder() . 'regions/');
         $this->getServer()->getScheduler()->scheduleRepeatingTask(new EveryMinuteTask($this), 60 * 20);
