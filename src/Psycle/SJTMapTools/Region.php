@@ -68,12 +68,12 @@ class Region {
      * @param type $name The region name
      * @param type $regionsDataFolder The folder where regions are stored
      * @param type $userName The user name
-     * @param int $x1 The x coordinate of the region start
-     * @param int $y1 The y coordinate of the region start
-     * @param int $z1 The z coordinate of the region start
-     * @param int $x2 The x coordinate of the region end
-     * @param int $y2 The y coordinate of the region end
-     * @param int $z2 The z coordinate of the region end
+     * @param double $x1 The x coordinate of the region start
+     * @param double $y1 The y coordinate of the region start
+     * @param double $z1 The z coordinate of the region start
+     * @param double $x2 The x coordinate of the region end
+     * @param double $y2 The y coordinate of the region end
+     * @param double $z2 The z coordinate of the region end
      * @return \self
      */
     static function fromWorld($name, $regionsDataFolder, $userName, $x1, $y1, $z1, $x2, $y2, $z2) {
