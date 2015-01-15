@@ -1,6 +1,6 @@
 name: SJTMapTools
 main: Psycle\SJTMapTools\SJTMapTools
-version: 0.0.1
+version: 1.0.1
 api: 1.0.0
 
 commands:
