@@ -78,7 +78,7 @@ class RubberBander {
         $zmin = min($this->currentZ1, $this->currentZ2);
         $zmax = max($this->currentZ1, $this->currentZ2);
 
-        for ($x = $xmin; $x <= $xmax; $x++) {
+        for ($x = $xmin + 1; $x < $xmax; $x+=2) {
             $this->previousBlocks[] = $level->getBlock(new Vector3($x, $ymin, $zmin));
             $this->previousBlocks[] = $level->getBlock(new Vector3($x, $ymin, $zmax));
             $this->previousBlocks[] = $level->getBlock(new Vector3($x, $ymax, $zmin));
@@ -89,7 +89,7 @@ class RubberBander {
             $level->setBlock(new Vector3($x, $ymax, $zmin), new Gold(), false, false);
             $level->setBlock(new Vector3($x, $ymax, $zmax), new Gold(), false, false);
         }
-        for ($y = $ymin + 1; $y < $ymax; $y++) {
+        for ($y = $ymin + 1; $y < $ymax; $y+=2) {
             $this->previousBlocks[] = $level->getBlock(new Vector3($xmin, $y, $zmin));
             $this->previousBlocks[] = $level->getBlock(new Vector3($xmin, $y, $zmax));
             $this->previousBlocks[] = $level->getBlock(new Vector3($xmax, $y, $zmin));
@@ -100,7 +100,7 @@ class RubberBander {
             $level->setBlock(new Vector3($xmax, $y, $zmin), new Gold(), false, false);
             $level->setBlock(new Vector3($xmax, $y, $zmax), new Gold(), false, false);
         }
-        for ($z = $zmin + 1; $z < $zmax; $z++) {
+        for ($z = $zmin + 1; $z < $zmax; $z+=2) {
             $this->previousBlocks[] = $level->getBlock(new Vector3($xmin, $ymin, $z));
             $this->previousBlocks[] = $level->getBlock(new Vector3($xmin, $ymax, $z));
             $this->previousBlocks[] = $level->getBlock(new Vector3($xmax, $ymin, $z));
@@ -129,19 +129,19 @@ class RubberBander {
 
         $previousBlocksIndex = 0;
 
-        for ($x = $xmin; $x <= $xmax; $x++) {
+        for ($x = $xmin + 1; $x < $xmax; $x+=2) {
             $level->setBlock(new Vector3($x, $ymin, $zmin), $this->previousBlocks[$previousBlocksIndex], false, false); $previousBlocksIndex++;
             $level->setBlock(new Vector3($x, $ymin, $zmax), $this->previousBlocks[$previousBlocksIndex], false, false); $previousBlocksIndex++;
             $level->setBlock(new Vector3($x, $ymax, $zmin), $this->previousBlocks[$previousBlocksIndex], false, false); $previousBlocksIndex++;
             $level->setBlock(new Vector3($x, $ymax, $zmax), $this->previousBlocks[$previousBlocksIndex], false, false); $previousBlocksIndex++;
         }
-        for ($y = $ymin + 1; $y < $ymax; $y++) {
+        for ($y = $ymin + 1; $y < $ymax; $y+=2) {
             $level->setBlock(new Vector3($xmin, $y, $zmin), $this->previousBlocks[$previousBlocksIndex], false, false); $previousBlocksIndex++;
             $level->setBlock(new Vector3($xmin, $y, $zmax), $this->previousBlocks[$previousBlocksIndex], false, false); $previousBlocksIndex++;
             $level->setBlock(new Vector3($xmax, $y, $zmin), $this->previousBlocks[$previousBlocksIndex], false, false); $previousBlocksIndex++;
             $level->setBlock(new Vector3($xmax, $y, $zmax), $this->previousBlocks[$previousBlocksIndex], false, false); $previousBlocksIndex++;
         }
-        for ($z = $zmin + 1; $z < $zmax; $z++) {
+        for ($z = $zmin + 1; $z < $zmax; $z+=2) {
             $level->setBlock(new Vector3($xmin, $ymin, $z), $this->previousBlocks[$previousBlocksIndex], false, false); $previousBlocksIndex++;
             $level->setBlock(new Vector3($xmin, $ymax, $z), $this->previousBlocks[$previousBlocksIndex], false, false); $previousBlocksIndex++;
             $level->setBlock(new Vector3($xmax, $ymin, $z), $this->previousBlocks[$previousBlocksIndex], false, false); $previousBlocksIndex++;
