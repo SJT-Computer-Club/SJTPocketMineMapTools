@@ -1,0 +1,37 @@
+name: SJTMapTools
+main: Psycle\SJTMapTools\SJTMapTools
+version: 0.0.1
+api: 1.0.0
+
+commands:
+    listregions:
+        description: "Lists all defined regions"
+        usage: "/listregions"
+    startregion:
+        description: "Starts a new region using the player's current location"
+        usage: "/startregion [player]"
+    cancelregion:
+        description: "Cancels the region that\'s been started"
+        usage: "/cancelregion [player]"
+    endregion:
+        description: "Finishes defining a new region using the player's current location, specifying the region name"
+        usage: "/endregion <regionname> [player]"
+    tptoregion:
+        description: "Teleports player to a named region"
+        usage: "/tptoregion <regionname> [player]"
+    deleteregion:
+        description: "Deletes a named region"
+        usage: "/deleteregion <regionname> [player]"
+    saveregion:
+        description: "Saves a snapshot of the region to disk and commits a revision"
+        usage: "/saveregion <regionname>"
+    revertregion:
+        description: "Reverts the content of a region to the last saved version"
+        usage: "/revertregion <regionname>"
+    requestpermit:
+        description: "Requests a permit to edit a region"
+        usage: "/requestpermit <regionname>"
+    releasepermit:
+        description: "Releases a region editing permit"
+        usage: "/releasepermit <regionname>"
+
