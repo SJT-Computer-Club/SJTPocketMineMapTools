@@ -2,6 +2,9 @@
 
 namespace Psycle\SJTMapTools;
 
+use pocketmine\block\Block;
+use pocketmine\Server;
+
 
 /**
  * Manages editable regions or a world.  Allows allocation of a permit to edit a
@@ -53,6 +56,24 @@ class RegionManager {
     }
 
     /**
+     * Perform regular actions.  Currently redraws any rubber bands for users
+     * currently defining regions.
+     */
+    function tick() {
+        foreach ($this->underway as $userName => $data) {
+            $player = Server::getInstance()->getPlayer($userName);
+            $rubberBander = $data[3];
+
+            if (is_null($player)) {
+                $this->cancelRegion($userName);
+                continue;
+            }
+
+            $rubberBander->plot($player->x, $player->y, $player->z);
+        }
+    }
+
+    /**
      * Parse the contents of the data folder.  Loads all found regions.
      */
     private function parseDataFolder() {
@@ -96,7 +117,7 @@ class RegionManager {
             return self::ERROR_REGION_ALREADY_STARTED;
         }
 
-        $this->underway[$userName] = [$x, $y, $z];
+        $this->underway[$userName] = [$x, $y, $z, new RubberBander($x, $y, $z)];
         return self::NO_ERROR;
     }
 
@@ -111,7 +132,10 @@ class RegionManager {
             return self::ERROR_REGION_NOT_STARTED;
         }
 
+        $rubberBander = $this->underway[$userName][3];
+        $rubberBander->stop();
         unset($this->underway[$userName]);
+
         return self::NO_ERROR;
     }
 
@@ -133,10 +157,12 @@ class RegionManager {
             return self::ERROR_REGION_EXISTS;
         }
 
-        $startData = $this->underway[$userName];
+        $data = $this->underway[$userName];
+        $rubberBander = $data[3];
+        $rubberBander->stop();
         unset($this->underway[$userName]);
 
-        $region = Region::fromWorld($regionName, $this->dataFolder, $userName, $startData[0], $startData[1], $startData[2], $x, $y, $z);
+        $region = Region::fromWorld($regionName, $this->dataFolder, $userName, $data[0], $data[1], $data[2], $x, $y, $z);
         $this->regions[$regionName] = $region;
         $region->drawMarkers();
 

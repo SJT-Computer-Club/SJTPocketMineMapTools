@@ -42,6 +42,7 @@ class SJTMapTools extends PluginBase implements Listener {
         $this->initDataFolder();
         $this->regionManager = new RegionManager($this->getDataFolder() . 'regions/');
         $this->getServer()->getScheduler()->scheduleRepeatingTask(new EveryMinuteTask($this), 60 * 20);
+        $this->getServer()->getScheduler()->scheduleRepeatingTask(new EverySecondTask($this), 1 * 20);
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
     }
 
@@ -58,6 +59,15 @@ class SJTMapTools extends PluginBase implements Listener {
      */
     public static function getInstance() {
         return self::$instance;
+    }
+
+    /**
+     * Get the RegionManager
+     *
+     * @return RegionManager
+     */
+    public function getRegionManager() {
+        return $this->regionManager;
     }
 
     /* Data handling */
