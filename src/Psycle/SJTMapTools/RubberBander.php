@@ -2,9 +2,9 @@
 
 namespace Psycle\SJTMapTools;
 
-use pocketmine\block\Gold;
 use pocketmine\math\Vector3;
 use pocketmine\Server;
+use Psycle\SJTMapTools\block\RegionMarker;
 
 /**
  * Handles the drawing of a 'rubber band' outline, without wiping out the world
@@ -84,10 +84,10 @@ class RubberBander {
             $this->previousBlocks[] = $level->getBlock(new Vector3($x, $ymax, $zmin));
             $this->previousBlocks[] = $level->getBlock(new Vector3($x, $ymax, $zmax));
 
-            $level->setBlock(new Vector3($x, $ymin, $zmin), new Gold(), false, false);
-            $level->setBlock(new Vector3($x, $ymin, $zmax), new Gold(), false, false);
-            $level->setBlock(new Vector3($x, $ymax, $zmin), new Gold(), false, false);
-            $level->setBlock(new Vector3($x, $ymax, $zmax), new Gold(), false, false);
+            $level->setBlock(new Vector3($x, $ymin, $zmin), new RegionMarker(), false, false);
+            $level->setBlock(new Vector3($x, $ymin, $zmax), new RegionMarker(), false, false);
+            $level->setBlock(new Vector3($x, $ymax, $zmin), new RegionMarker(), false, false);
+            $level->setBlock(new Vector3($x, $ymax, $zmax), new RegionMarker(), false, false);
         }
         for ($y = $ymin + 1; $y < $ymax; $y+=2) {
             $this->previousBlocks[] = $level->getBlock(new Vector3($xmin, $y, $zmin));
@@ -95,10 +95,10 @@ class RubberBander {
             $this->previousBlocks[] = $level->getBlock(new Vector3($xmax, $y, $zmin));
             $this->previousBlocks[] = $level->getBlock(new Vector3($xmax, $y, $zmax));
 
-            $level->setBlock(new Vector3($xmin, $y, $zmin), new Gold(), false, false);
-            $level->setBlock(new Vector3($xmin, $y, $zmax), new Gold(), false, false);
-            $level->setBlock(new Vector3($xmax, $y, $zmin), new Gold(), false, false);
-            $level->setBlock(new Vector3($xmax, $y, $zmax), new Gold(), false, false);
+            $level->setBlock(new Vector3($xmin, $y, $zmin), new RegionMarker(), false, false);
+            $level->setBlock(new Vector3($xmin, $y, $zmax), new RegionMarker(), false, false);
+            $level->setBlock(new Vector3($xmax, $y, $zmin), new RegionMarker(), false, false);
+            $level->setBlock(new Vector3($xmax, $y, $zmax), new RegionMarker(), false, false);
         }
         for ($z = $zmin + 1; $z < $zmax; $z+=2) {
             $this->previousBlocks[] = $level->getBlock(new Vector3($xmin, $ymin, $z));
@@ -106,10 +106,10 @@ class RubberBander {
             $this->previousBlocks[] = $level->getBlock(new Vector3($xmax, $ymin, $z));
             $this->previousBlocks[] = $level->getBlock(new Vector3($xmax, $ymax, $z));
 
-            $level->setBlock(new Vector3($xmin, $ymin, $z), new Gold(), false, false);
-            $level->setBlock(new Vector3($xmin, $ymax, $z), new Gold(), false, false);
-            $level->setBlock(new Vector3($xmax, $ymin, $z), new Gold(), false, false);
-            $level->setBlock(new Vector3($xmax, $ymax, $z), new Gold(), false, false);
+            $level->setBlock(new Vector3($xmin, $ymin, $z), new RegionMarker(), false, false);
+            $level->setBlock(new Vector3($xmin, $ymax, $z), new RegionMarker(), false, false);
+            $level->setBlock(new Vector3($xmax, $ymin, $z), new RegionMarker(), false, false);
+            $level->setBlock(new Vector3($xmax, $ymax, $z), new RegionMarker(), false, false);
         }
     }
 
