@@ -13,23 +13,23 @@ use pocketmine\Server;
 class RegionManager {
     /**
      * The location of the Git repository containing region data
-     * @var type string
+     * @var string
      */
-    private static $gitRepo = 'https://github.com/SJT-Computer-Club/SJTPocketMineMapRegions.git';
+    private $gitRepo;
     /**
      * The data folder for storing regions
-     * @var type string
+     * @var string
      */
     private $dataFolder;
     /**
      * An associative array of all Region objects. key=regionname, value=Region
-     * @var type array of Regions
+     * @var array of Regions
      */
     private $regions = array();
     /**
      * An associative array containing all regions that are in the process of
      * being defined by users. key=username, value=array of start coordinates
-     * @var type array
+     * @var array
      */
     private $underway = array();
 
@@ -50,8 +50,9 @@ class RegionManager {
      *
      * @param string $dataFolder The regions data folder
      */
-    function __construct($dataFolder) {
+    function __construct($dataFolder, $gitRepo) {
         $this->dataFolder = $dataFolder;
+        $this->gitRepo = $gitRepo;
         $this->parseDataFolder();
     }
 
@@ -78,8 +79,14 @@ class RegionManager {
      */
     private function parseDataFolder() {
         if (!is_dir($this->dataFolder)) {
-            SJTMapTools::getInstance()->getLogger()->info('The regions folder doesn\'t exist.  Cloning from ' . self::$gitRepo . '…');
-            GitTools::gitClone($this->dataFolder, self::$gitRepo);
+            if ($this->gitRepo == "" ) {
+                SJTMapTools::getInstance()->getLogger()->info('The regions folder doesn\'t exist. No git repo configured, creating a local repo…');
+                mkdir($this->dataFolder, 0755, true);
+                GitTools::gitCreate($this->dataFolder);
+            } else {
+                SJTMapTools::getInstance()->getLogger()->info('The regions folder doesn\'t exist. Cloning from ' . $this->gitRepo . '…');
+                GitTools::gitClone($this->dataFolder, $this->gitRepo);
+            }
         }
 
         $directories = scandir($this->dataFolder);
