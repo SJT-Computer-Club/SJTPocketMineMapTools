@@ -50,6 +50,7 @@ class SJTMapTools extends PluginBase implements Listener {
      * Called when the plugin is disabled
      */
     public function onDisable() {
+        $this->regionManager->cancelAllRegions();
         $this->getLogger()->info('Plugin Disabled');
     }
 

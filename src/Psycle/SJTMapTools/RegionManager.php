@@ -140,6 +140,15 @@ class RegionManager {
     }
 
     /**
+     * Cancel all regions currently being defined
+     */
+    public function cancelAllRegions() {
+        foreach ($this->underway as $userName => $data) {
+            $this->cancelRegion($userName);
+        }
+    }
+
+    /**
      * Finish defining a region for a user
      *
      * @param string $userName The user's name
