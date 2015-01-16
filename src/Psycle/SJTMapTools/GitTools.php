@@ -19,6 +19,17 @@ class GitTools {
     }
 
     /**
+    * Create a local git repository
+    *
+    * @param string $filePath The local folder path to create the repo in
+    */
+    public static function gitCreate($filePath) {
+        $pathInfo = pathinfo($filePath);
+        $command = 'cd "' . $pathInfo['dirname'] . '"; git init; git add .';
+        exec($command);
+    }
+
+    /**
      * Add a file to the Git repo, forcing in case the file is affected by
      * a .gitignore
      *
