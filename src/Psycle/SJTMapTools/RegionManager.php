@@ -70,7 +70,7 @@ class RegionManager {
                 continue;
             }
 
-            $rubberBander->plot($player->x, $player->y, $player->z);
+            $rubberBander->plot($player);
         }
     }
 
@@ -144,6 +144,15 @@ class RegionManager {
         unset($this->underway[$userName]);
 
         return self::NO_ERROR;
+    }
+
+    /**
+     * Cancel all regions currently being defined
+     */
+    public function cancelAllRegions() {
+        foreach ($this->underway as $userName => $data) {
+            $this->cancelRegion($userName);
+        }
     }
 
     /**
