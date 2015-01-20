@@ -70,7 +70,7 @@ class RegionManager {
                 continue;
             }
 
-            $rubberBander->plot($player->x, $player->y, $player->z);
+            $rubberBander->plot($player);
         }
     }
 

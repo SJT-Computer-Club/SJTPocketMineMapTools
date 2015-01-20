@@ -7,7 +7,7 @@ use pocketmine\block\Gold;
 
 class RegionMarker extends Gold {
 
-    protected $id = 20000;
+    //protected $id = 20000;
 
     public function __construct() {
         parent::__construct();
