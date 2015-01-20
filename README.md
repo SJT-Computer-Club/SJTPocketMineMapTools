@@ -9,7 +9,7 @@ SJTPocketMineMapTools is a [PocketMine-MP] plugin, using the new API, that provi
   - Edits to regions are revision controlled using Git
 
 ### Version
-1.1
+1.1.1
 
 ### Usage
 
