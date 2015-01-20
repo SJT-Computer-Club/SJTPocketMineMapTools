@@ -19,28 +19,34 @@ class SJTMapTools extends PluginBase implements Listener {
 
     /**
      * A static reference to this plugin instance
-     * @var type SJTMapTools
+     * @var SJTMapTools
      */
     private static $instance;
 
     /**
      * Our RegionManager instance
-     * @var type RegionManager
+     * @var RegionManager
      */
     private $regionManager;
+
+    /**
+     * The location of the Git repository containing region data
+     * @var string
+     */
+    private $regionsGitRepo;
 
     /**
      * Called when the plugin is enabled
      */
     public function onEnable() {
         self::$instance = $this;
-        $level = Server::getInstance()->getDefaultLevel();
 
         $this->getLogger()->info('Plugin Enabled');
-        // TODO This should be configurable
-        $level->setSpawnLocation(new Vector3(1500, 130, 1500));
+
+        $this->initConfig();
         $this->initDataFolder();
-        $this->regionManager = new RegionManager($this->getDataFolder() . 'regions/');
+
+        $this->regionManager = new RegionManager($this->getDataFolder() . 'regions/', $this->regionsGitRepo);
         $this->getServer()->getScheduler()->scheduleRepeatingTask(new EveryMinuteTask($this), 60 * 20);
         $this->getServer()->getScheduler()->scheduleRepeatingTask(new EverySecondTask($this), 1 * 20);
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
@@ -50,6 +56,7 @@ class SJTMapTools extends PluginBase implements Listener {
      * Called when the plugin is disabled
      */
     public function onDisable() {
+        $this->regionManager->cancelAllRegions();
         $this->getLogger()->info('Plugin Disabled');
     }
 
@@ -71,6 +78,24 @@ class SJTMapTools extends PluginBase implements Listener {
     }
 
     /* Data handling */
+
+    /**
+     * Load the default config, ensure it is saved to config override, load
+     * values
+     */
+    private function initConfig() {
+        // Take the default config from [plugin folder]/resources/config.yml
+        // and save it to [data folder]/config.yml if the file doesn't exist
+        $this->saveDefaultConfig();
+
+        $config = $this->getConfig();
+
+        $level = Server::getInstance()->getDefaultLevel();
+        $defaultSpawnPoint = $config->get("defaultspawnpoint");
+        $level->setSpawnLocation(new Vector3($defaultSpawnPoint["x"], $defaultSpawnPoint["y"], $defaultSpawnPoint["z"]));
+
+        $this->regionsGitRepo = $config->get("regionsgitrepo");
+    }
 
     /**
      * Create the data folder structure

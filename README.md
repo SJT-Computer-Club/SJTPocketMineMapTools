@@ -9,7 +9,7 @@ SJTPocketMineMapTools is a [PocketMine-MP] plugin, using the new API, that provi
   - Edits to regions are revision controlled using Git
 
 ### Version
-1.0.1
+1.1
 
 ### Usage
 
@@ -72,7 +72,6 @@ On first run, the plugin will create a folder `[PocketMine Folder]/plugins/SJTMa
 
  - Currently anyone can define regions, this should be permission controlled.
  - Currently when requesting a permit, it is allocated immediately (if noone else has a permit for that region).  Need to implement a permission layer so that permits are approved / declined by an admin.
- - Currently there are some hard coded config values, specific to the SJT project.  Break these out into yaml.
 
 
 License

@@ -1,0 +1,8 @@
+# The default spawn point for all users
+defaultspawnpoint:
+    x: 1500
+    y: 200
+    z: 1500
+
+# The URL to the Git repository for storing regions
+regionsgitrepo: ""
