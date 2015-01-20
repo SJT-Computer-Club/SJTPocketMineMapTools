@@ -113,10 +113,10 @@ class Region {
      * @return string
      */
     function __toString() {
-        return "Name: " . TextFormat::LIGHT_PURPLE . " " . $this->name .
-                "\n    " . TextFormat::WHITE . "1st corner: [" . TextFormat::YELLOW . $this->x1 . ", " . $this->y1 . ", " . $this->z1 . TextFormat::WHITE . "]" .
-                "\n    " . TextFormat::WHITE . "2nd corner: [" . TextFormat::YELLOW . $this->x2 . ", " . $this->y2 . ", " . $this->z2 . TextFormat::WHITE . "]" .
-                (!is_null($this->permitUserName) ? "\n    Permit issued to: " . TextFormat::YELLOW . $this->permitUserName : "");
+        return TextFormat::LIGHT_PURPLE . $this->name . TextFormat::WHITE . ": " .
+                "[" . TextFormat::YELLOW . $this->x1 . ", " . $this->y1 . ", " . $this->z1 . TextFormat::WHITE . "] " .
+                "[" . TextFormat::YELLOW . $this->x2 . ", " . $this->y2 . ", " . $this->z2 . TextFormat::WHITE . "]" .
+                (!is_null($this->permitUserName) ? " Permit: " . TextFormat::YELLOW . $this->permitUserName : "");
 
     }
 
